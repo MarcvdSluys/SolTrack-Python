@@ -82,7 +82,8 @@ def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqual
     rsTime.second = 0.0
     
     # Compute the Sun's position.  Returns a Position object:
-    pos = st.computeSunPosition(loc, rsTime, False, useNorthEqualsZero, computeRefrEquatorial, computeDistance)  # useDegrees = False: NEVER use degrees internally!
+    pos = st.Position()
+    pos.computeSunPosition(loc, rsTime, False, useNorthEqualsZero, computeRefrEquatorial, computeDistance)  # useDegrees = False: NEVER use degrees internally!
     
     agst0 = pos.agst      # AGST for midnight
     
@@ -111,7 +112,7 @@ def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqual
             th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
             
             rsTime.second = tmRad[evi]*R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
-            pos = st.computeSunPosition(loc, rsTime, False, useNorthEqualsZero, computeRefrEquatorial, computeDistance)  # useDegrees = False: NEVER use degrees internally!
+            pos.computeSunPosition(loc, rsTime, False, useNorthEqualsZero, computeRefrEquatorial, computeDistance)  # useDegrees = False: NEVER use degrees internally!
             
             ha  = revPI(th0 + loc.longitude - pos.rightAscension)        # Hour angle: -PI - +PI
             alt = m.asin(m.sin(loc.latitude)*m.sin(pos.declination) +

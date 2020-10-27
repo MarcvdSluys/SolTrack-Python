@@ -20,15 +20,12 @@
 
 """
 
-import pytz as tz
 import datetime as dt
+import pytz as tz
 
 
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
-    
-    sinLat:      float = 0.0
-    cosLat:      float = 0.0
     
     def __init__(self, longitude, latitude, pressure=101.0, temperature=283.0):
         self.longitude = longitude
@@ -36,6 +33,7 @@ class Location:
         
         self.pressure    = pressure
         self.temperature = temperature
+        
     
 
 class Time:
@@ -86,33 +84,6 @@ class Time:
         return Time.datetime2st(dt.datetime.now())
         
         
-class Position:
-    """Class containing the position of the Sun and related variables."""
-    
-    julianDay:           float = 0.0
-    tJD:                 float = 0.0
-    tJC:                 float = 0.0
-    tJC2:                float = 0.0
-    
-    longitude:           float = 0.0
-    distance:            float = 0.0
-    
-    obliquity:           float = 0.0
-    cosObliquity:        float = 0.0
-    nutationLon:         float = 0.0
-    
-    rightAscension:      float = 0.0
-    declination:         float = 0.0
-    agst:                float = 0.0
-    
-    altitude:            float = 0.0
-    altitudeRefract:     float = 0.0
-    azimuthRefract:      float = 0.0
-    
-    hourAngleRefract:    float = 0.0
-    declinationRefract:  float = 0.0
-
-
 class RiseSet:
     """Class containing rise,transit and set times of the Sun and their azimuths/altitudes."""
     
