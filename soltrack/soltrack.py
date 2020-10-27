@@ -22,7 +22,7 @@
 
 import math as m
 from soltrack.data import PI, TWO_PI, R2D
-from soltrack.dataclasses import Location, Position, copyDataclass
+from soltrack.dataclasses import Position, copyObject
 
 
 
@@ -32,8 +32,8 @@ def computeSunPosition(location, time,  useDegrees=False, useNorthEqualsZero=Fal
     Main function to compute the position of the Sun.
     
     Parameters:
-      location          (Location):  Dataclass containing the geographic location to compute the Sun's position for.
-      time                  (Time):  Dataclass containing date and time to compute the position for, in UT.
+      location          (Location):  Class containing the geographic location to compute the Sun's position for.
+      time                  (Time):  Class containing date and time to compute the position for, in UT.
     
       useDegrees            (bool):  Use degrees for input and output angular variables, rather than radians (optional, default=False).
       useNorthEqualsZero    (bool):  Use the definition where azimuth=0 denotes north, rather than south (optional, default=False).
@@ -41,14 +41,13 @@ def computeSunPosition(location, time,  useDegrees=False, useNorthEqualsZero=Fal
       computeDistance       (bool):  Compute distance to the Sun (optional, default=False).
     
     Returns:
-      (Position):  Dataclass containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
+      (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
     
     """
     
     # If the used uses degrees, convert the geographic location to radians:
-    # In C, a local copy of location is made.  With Python dataclasses, this doesn't seem to work (pointer?)
-    
-    loc = copyDataclass(Location, location)  # Local of the Location dataclass
+    # In C, a local copy of location is made.  With Python objects, we need a deep copy.
+    loc = copyObject(location)  # Local instance of the Location class, so that it can be changed here
     if(useDegrees):
         loc.longitude /= R2D
         loc.latitude  /= R2D
@@ -141,7 +140,7 @@ def computeLongitude(position, computeDistance=False):
       - Also computes the obliquity of the ecliptic and nutation.
     
     Parameters:
-      position    (Position):  Dataclass containing the position of the Sun (I/O).
+      position    (Position):  Class containing the position of the Sun (I/O).
       computeDistance (bool):  Compute distance to the Sun (optional, default=False).
     
     """
@@ -215,8 +214,8 @@ def convertEquatorialToHorizontal(location, position):
     Also corrects for parallax and atmospheric refraction.
     
     Parameters:
-      location (Location):  Dataclass contaning the geographic location of the observer (rad).
-      position (Position):  Dataclass contaning the position of the Sun (rad, I/O).
+      location (Location):  Class containing the geographic location of the observer (rad).
+      position (Position):  Class containing the position of the Sun (rad, I/O).
     
     """
     
@@ -347,7 +346,7 @@ def convertRadiansToDegrees(position, computeRefrEquatorial):
     Note:
       - Does not touch intermediate results.
     
-    position          (Position):  Dataclass containing Sun position (I/O).
+    position          (Position):  Class containing Sun position (I/O).
     computeRefrEquatorial (bool):  Compute refraction correction for equatorial coordinates.
     
     """

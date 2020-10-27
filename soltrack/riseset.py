@@ -25,26 +25,26 @@ import math as m
 import numpy as np
 import soltrack as st
 from soltrack.data import PI,TWO_PI, R2D,R2H
-from soltrack.dataclasses import Location, Time, RiseSet, copyDataclass
+from soltrack.dataclasses import Time, RiseSet, copyObject
 
 
 def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqualsZero=False):
     """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
     
     Parameters:
-      location           (Location):  Dataclass containing the geographic location to compute the Sun's rise and set times for.
-      time               (Time):      Dataclass containing date and time to compute the position for, in UT.
+      location           (Location):  Class containing the geographic location to compute the Sun's rise and set times for.
+      time               (Time):      Class containing date and time to compute the position for, in UT.
       rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
       useDegrees         (bool):      Use degrees for input and output angular variables, rather than radians (optional, default=False).
       useNorthEqualsZero (bool):      Use the definition where azimuth=0 denotes north, rather than south (optional, default=False).
     
     Returns:
-      (RiseSet):   Dataclass containing the Sun's rise, transit and set data.
+      (RiseSet):   Class containing the Sun's rise, transit and set data.
     
     Note:
       - if rsAlt == 0.0, actual rise and set times are computed
       - if rsAlt != 0.0, the routine calculates when alt = rsAlt is reached
-      - returns times, rise/set azimuth and transit altitude in the dataclass riseSet
+      - returns times, rise/set azimuth and transit altitude in the class riseSet
      
       See:
         - subroutine riset() in riset.f90 from libTheSky (libthesky.sf.net) for more info
@@ -64,14 +64,14 @@ def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqual
     # If the used uses degrees, convert the geographic location to radians:
     # This was a local variable llocation in C
     
-    loc = copyDataclass(Location, location)  # Local instance of the Location dataclass, so that it can be changed
+    loc = copyObject(location)  # Local instance of the Location class, so that it can be changed here
     if(useDegrees):
         loc.longitude /= R2D
         loc.latitude  /= R2D
     
     
     # Set date and time to midnight UT for the desired day:
-    rsTime        = Time()  # Local instance of the dataclass Time
+    rsTime        = Time()  # Local Time object
     
     rsTime.year   = time.year
     rsTime.month  = time.month
@@ -167,7 +167,7 @@ def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqual
         
         
     # Store results:
-    riseSet = RiseSet()  # Instance of the dataclass RiseSet, to store and return the results
+    riseSet = RiseSet()   # Instance RiseSet object, to store and return the results
     
     riseSet.transitTime     = tmRad[0]*R2H  # Transit time - radians -> hours
     riseSet.riseTime        = tmRad[1]*R2H  # Rise time - radians -> hours

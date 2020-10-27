@@ -20,42 +20,35 @@
 
 """
 
-# Create dataclasses, used like C structs.
-# 
-# Note, dataclasses new in Python 3.7.  For Python 3.6, (pip) install dataclasses.
-#   - https://stackoverflow.com/a/45426493/1386750
-
-from dataclasses import dataclass
 import pytz as tz
 import datetime as dt
 
 
-@dataclass
-class Location:
-    """Dataclass containing the geographic location to compute the Sun position for."""
-    
-    longitude:   float = 0.0
-    latitude:    float = 0.0
+class Location(object):
+    """Class containing the geographic location to compute the Sun position for."""
     
     sinLat:      float = 0.0
     cosLat:      float = 0.0
     
-    pressure:    float = 101.0  # kPa
-    temperature: float = 283.0  # Kelvin
+    def __init__(self, longitude, latitude, pressure=101.0, temperature=283.0):
+        self.longitude = longitude
+        self.latitude  = latitude
+        
+        self.pressure    = pressure
+        self.temperature = temperature
     
 
-@dataclass
-class Time:
-    """Dataclass containing the date and time (in UT) to compute the Sun position for."""
+class Time(object):
+    """Class containing the date and time (in UT) to compute the Sun position for."""
     
-    year:   int   = 2000
-    month:  int   = 1
-    day:    int   = 1
-    
-    hour:   int   = 12
-    minute: int   = 0
-    second: float = 0.0
-    
+    def __init__(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
+        self.year = year
+        self.month = month
+        self.day = day
+        self.hour = hour
+        self.minute = minute
+        self.second = second
+
     
     def datetime2st(dtObj):
         """Convert a datetime object to a SolTrack time object.
@@ -93,11 +86,8 @@ class Time:
         return Time.datetime2st(dt.datetime.now())
         
         
-
-
-@dataclass
-class Position:
-    """Dataclass containing the position of the Sun and related variables."""
+class Position(object):
+    """Class containing the position of the Sun and related variables."""
     
     julianDay:           float = 0.0
     tJD:                 float = 0.0
@@ -123,9 +113,8 @@ class Position:
     declinationRefract:  float = 0.0
 
 
-@dataclass
-class RiseSet:
-    """Dataclass containing rise,transit and set times of the Sun and their azimuths/altitudes."""
+class RiseSet(object):
+    """Class containing rise,transit and set times of the Sun and their azimuths/altitudes."""
     
     riseTime:         float = 0.0
     transitTime:      float = 0.0
@@ -140,32 +129,26 @@ class RiseSet:
     
 
 
-def copyDataclass(Class, oldInst):
-    """Copy an existing dataclass object by creating a new instance and copying its members.
+def copyObject(oldInst):
+    """Deep copy an existing object by creating a new instance and copying its members.
     
     Note:
-      - Simply copying a data-class object copies it's *address*, and doesn't make a *data copy*.
+      - Simply copying an object copies it's *address*, and doesn't make a *data copy*.
     
     Parameters:
-      Class (class):    the (name of the) class.
       oldInst (Class):  the existing object.
     
     Returns:
       (Class):  the new object.
     
     See:
-      - https://stackoverflow.com/a/57962958/1386750
+      - https://stackoverflow.com/a/4794254/1386750
     
     """
     
-    from dataclasses import fields
+    import copy
     
-    # Create a new instance:
-    newInst = Class
+    newInst = copy.deepcopy(oldInst)
     
-    # Copy all data fields:
-    for field in fields(Class):
-        setattr(newInst, field.name, getattr(oldInst, field.name))
-        
     return newInst
     
