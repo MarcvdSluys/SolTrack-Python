@@ -25,7 +25,7 @@ import math as m
 import numpy as np
 import soltrack as st
 from soltrack.data import PI,TWO_PI, R2D,R2H
-from soltrack.dataclasses import Time, RiseSet, copyObject
+from soltrack.dataclasses import Time, RiseSet
 
 
 def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqualsZero=False):
@@ -63,8 +63,8 @@ def computeSunRiseSet(location, time, rsAlt=0.0, useDegrees=False, useNorthEqual
     
     # If the used uses degrees, convert the geographic location to radians:
     # This was a local variable llocation in C
-    
-    loc = copyObject(location)  # Local instance of the Location class, so that it can be changed here
+    import copy
+    loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
     if(useDegrees):
         loc.longitude /= R2D
         loc.latitude  /= R2D

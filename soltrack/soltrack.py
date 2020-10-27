@@ -22,7 +22,7 @@
 
 import math as m
 from soltrack.data import PI, TWO_PI, R2D
-from soltrack.dataclasses import Position, copyObject
+from soltrack.dataclasses import Position
 
 
 
@@ -47,7 +47,8 @@ def computeSunPosition(location, time,  useDegrees=False, useNorthEqualsZero=Fal
     
     # If the used uses degrees, convert the geographic location to radians:
     # In C, a local copy of location is made.  With Python objects, we need a deep copy.
-    loc = copyObject(location)  # Local instance of the Location class, so that it can be changed here
+    import copy
+    loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
     if(useDegrees):
         loc.longitude /= R2D
         loc.latitude  /= R2D

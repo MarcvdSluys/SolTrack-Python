@@ -24,7 +24,7 @@ import pytz as tz
 import datetime as dt
 
 
-class Location(object):
+class Location:
     """Class containing the geographic location to compute the Sun position for."""
     
     sinLat:      float = 0.0
@@ -38,7 +38,7 @@ class Location(object):
         self.temperature = temperature
     
 
-class Time(object):
+class Time:
     """Class containing the date and time (in UT) to compute the Sun position for."""
     
     def __init__(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
@@ -86,7 +86,7 @@ class Time(object):
         return Time.datetime2st(dt.datetime.now())
         
         
-class Position(object):
+class Position:
     """Class containing the position of the Sun and related variables."""
     
     julianDay:           float = 0.0
@@ -113,7 +113,7 @@ class Position(object):
     declinationRefract:  float = 0.0
 
 
-class RiseSet(object):
+class RiseSet:
     """Class containing rise,transit and set times of the Sun and their azimuths/altitudes."""
     
     riseTime:         float = 0.0
@@ -123,32 +123,4 @@ class RiseSet(object):
     riseAzimuth:      float = 0.0
     transitAltitude:  float = 0.0
     setAzimuth:       float = 0.0
-    
-    
-    
-    
-
-
-def copyObject(oldInst):
-    """Deep copy an existing object by creating a new instance and copying its members.
-    
-    Note:
-      - Simply copying an object copies it's *address*, and doesn't make a *data copy*.
-    
-    Parameters:
-      oldInst (Class):  the existing object.
-    
-    Returns:
-      (Class):  the new object.
-    
-    See:
-      - https://stackoverflow.com/a/4794254/1386750
-    
-    """
-    
-    import copy
-    
-    newInst = copy.deepcopy(oldInst)
-    
-    return newInst
     
