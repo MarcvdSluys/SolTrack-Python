@@ -20,9 +20,6 @@
 
 """
 
-import datetime as dt
-import pytz as tz
-
 
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
@@ -33,53 +30,4 @@ class Location:
         
         self.pressure    = pressure
         self.temperature = temperature
-        
-    
-
-class Time:
-    """Class containing the date and time (in UT) to compute the Sun position for."""
-    
-    def __init__(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
-        self.year   = year
-        self.month  = month
-        self.day    = day
-        self.hour   = hour
-        self.minute = minute
-        self.second = second
-
-    
-    def datetime2st(self, dtObj):
-        """Convert a datetime object to a SolTrack time object.
-        
-           Args:
-               dtObj (datetime):  Date and time in a Python datetime object.
-               
-           Returns:
-               Time:  Date and time in a SolTrack time object.
-        
-        """
-        
-        utc         = dtObj.astimezone(tz.utc)  # Convert from local time to UTC
-        
-        self.year   = utc.year
-        self.month  = utc.month
-        self.day    = utc.day
-        
-        self.hour   = utc.hour
-        self.minute = utc.minute
-        self.second = utc.second + utc.microsecond/1e6
-        
-        return
-
-    
-    def now(self):
-        """Return the current system time as a SolTrack time object.
-        
-           Returns:
-               Current system date and time in a SolTrack time object.
-        """
-        self.datetime2st(dt.datetime.now())
-        
-        return
-        
         

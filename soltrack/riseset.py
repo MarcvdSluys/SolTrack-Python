@@ -25,7 +25,7 @@ import math as m
 import numpy as np
 import soltrack as st
 from soltrack.data import PI,TWO_PI, R2D,R2H
-from soltrack.dataclasses import Time
+from soltrack.time import Time
 
 
 class RiseSet:

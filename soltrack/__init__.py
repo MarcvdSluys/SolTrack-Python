@@ -26,8 +26,9 @@ the [SolTrack homepage](http://soltrack.sf.net).
 name = "soltrack"
 
 from .data import *
-from .dataclasses import *
-from .soltrack import *
+from .location import *
+from .time import *
+from .position import *
 from .riseset import *
 
 
