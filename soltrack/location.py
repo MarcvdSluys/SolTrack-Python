@@ -31,3 +31,4 @@ class Location:
         self.pressure    = pressure
         self.temperature = temperature
         
+        return

@@ -66,8 +66,7 @@ class Position:
         
         
         # Compute the Julian Day from the date and time:
-        self.julianDay = self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute,
-                                               time.second)
+        self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute, time.second)
         
         
         # Derived expressions of time:
@@ -80,8 +79,7 @@ class Position:
         self.computeLongitude(computeDistance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self.rightAscension, self.declination = self.convertEclipticToEquatorial(self.longitude,
-                                                                                 self.cosObliquity)
+        self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
         self.convertEquatorialToHorizontal(loc)
@@ -89,15 +87,12 @@ class Position:
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(computeRefrEquatorial):
-            self.hourAngleRefract,self.declinationRefract = \
-                self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
-                                                   self.altitudeRefract)
+            self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
+                                               self.altitudeRefract)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(useNorthEqualsZero):
-            self.azimuthRefract, self.hourAngleRefract = self.setNorthToZero(self.azimuthRefract,
-                                                                             self.hourAngleRefract,
-                                                                             computeRefrEquatorial)
+            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract, computeRefrEquatorial)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(useDegrees):
@@ -134,9 +129,10 @@ class Position:
         tmp2 = 2 - tmp1 + m.floor(tmp1/4.0)
         
         dDay = day + hour/24.0 + minute/1440.0 + second/86400.0
-        JD = m.floor(365.250*(year+4716)) + m.floor(30.60010*(month+1)) + dDay + tmp2 - 1524.5
         
-        return JD
+        self.julianDay = m.floor(365.250*(year+4716)) + m.floor(30.60010*(month+1)) + dDay + tmp2 - 1524.5
+        
+        return
     
     
     
@@ -207,12 +203,12 @@ class Position:
         """
         
         sinLon = m.sin(longitude)
-        sinObl = m.sqrt(1.0-cosObliquity*cosObliquity)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
+        sinObl = m.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        rightAscension   = m.atan2(cosObliquity*sinLon, m.cos(longitude)) % TWO_PI  # 0 <= azimuth < 2pi
-        declination      = m.asin(sinObl*sinLon)
+        self.rightAscension   = m.atan2(cosObliquity*sinLon, m.cos(longitude)) % TWO_PI  # 0 <= azimuth < 2pi
+        self.declination      = m.asin(sinObl*sinLon)
         
-        return rightAscension, declination
+        return
     
     
     def convertEquatorialToHorizontal(self, location):
@@ -307,20 +303,20 @@ class Position:
         
         # Multiply used variables:
         cosAz  = m.cos(azimuth)
-        sinAz  = m.sin(azimuth)                                            # For symmetry
+        sinAz  = m.sin(azimuth)                                      # For symmetry
         
         sinAlt = m.sin(altitude)
-        cosAlt = m.sqrt(1.0 - sinAlt * sinAlt)                             # Cosine of an altitude is always positive or zero
+        cosAlt = m.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
         tanAlt = sinAlt/cosAlt
         
-        hourAngle   = m.atan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
-        declination = m.asin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
+        self.hourAngleRefract   = m.atan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
+        self.declinationRefract = m.asin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
         
-        return hourAngle, declination
+        return
     
     
     
-    def setNorthToZero(self, azimuth, hourAngle, computeRefrEquatorial):
+    def setNorthToZero(self, azimuthRefract, hourAngleRefract, computeRefrEquatorial):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -340,12 +336,12 @@ class Position:
         
         """
         
-        azimuth = (azimuth + PI) % TWO_PI                    # Add PI to set North=0
+        self.azimuthRefract = (azimuthRefract + PI) % TWO_PI                    # Add PI to set North=0
         
         if(computeRefrEquatorial):
-            hourAngle = (hourAngle + PI) % TWO_PI            # Add PI to set North=0
+            self.hourAngleRefract = (hourAngleRefract + PI) % TWO_PI            # Add PI to set North=0
             
-        return azimuth, hourAngle
+        return
     
     
     def convertRadiansToDegrees(self, computeRefrEquatorial):

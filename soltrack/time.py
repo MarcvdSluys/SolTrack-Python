@@ -34,6 +34,8 @@ class Time:
         self.hour   = hour
         self.minute = minute
         self.second = second
+        
+        return
 
     
     def datetime2st(self, dtObj):
