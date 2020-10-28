@@ -22,7 +22,6 @@
 
 import math as m
 from soltrack.data import PI, TWO_PI, R2D
-# from soltrack.dataclasses import Position
 
 
 

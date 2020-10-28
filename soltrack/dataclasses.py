@@ -84,14 +84,3 @@ class Time:
         return Time.datetime2st(dt.datetime.now())
         
         
-class RiseSet:
-    """Class containing rise,transit and set times of the Sun and their azimuths/altitudes."""
-    
-    riseTime:         float = 0.0
-    transitTime:      float = 0.0
-    setTime:          float = 0.0
-    
-    riseAzimuth:      float = 0.0
-    transitAltitude:  float = 0.0
-    setAzimuth:       float = 0.0
-    
