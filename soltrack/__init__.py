@@ -25,10 +25,22 @@ the [SolTrack homepage](http://soltrack.sf.net).
 
 name = "soltrack"
 
-from .data import *
-from .location import *
-from .time import *
-from .position import *
-from .riseset import *
+# from .data import *
+from .location import Location
+from .time import Time
+from .position import Position
+from .riseset import RiseSet
 
 
+
+class SolTrack():
+    
+    
+    def __init__(self):
+        self.loc       = Location()
+        self.time      = Time()
+        self.pos       = Position()
+        self.riseSet   = RiseSet()
+        
+        return
+    

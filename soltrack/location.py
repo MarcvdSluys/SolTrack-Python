@@ -24,7 +24,11 @@
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
     
-    def __init__(self, longitude, latitude, pressure=101.0, temperature=283.0):
+    def __init__(self):
+        return
+    
+    
+    def setLocation(self, longitude, latitude, pressure=101.0, temperature=283.0):
         self.longitude = longitude
         self.latitude  = latitude
         
@@ -32,3 +36,4 @@ class Location:
         self.temperature = temperature
         
         return
+

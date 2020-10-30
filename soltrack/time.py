@@ -27,16 +27,21 @@ import pytz as tz
 class Time:
     """Class containing the date and time (in UT) to compute the Sun position for."""
     
-    def __init__(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
+    def __init__(self):
+        return
+    
+    
+    def setTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
         self.year   = year
         self.month  = month
         self.day    = day
+        
         self.hour   = hour
         self.minute = minute
         self.second = second
         
         return
-
+    
     
     def datetime2st(self, dtObj):
         """Convert a datetime object to a SolTrack time object.
@@ -60,7 +65,7 @@ class Time:
         self.second = utc.second + utc.microsecond/1e6
         
         return
-
+    
     
     def now(self):
         """Return the current system time as a SolTrack time object.
