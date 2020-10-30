@@ -21,7 +21,7 @@
 """
 
 from dataclasses import dataclass
-import math as m
+import numpy as np
 from soltrack.data import PI, TWO_PI, R2D
 
 
@@ -57,8 +57,8 @@ class Position:
             loc.latitude  /= R2D
         
         # Compute these once and reuse:
-        loc.sinLat = m.sin(loc.latitude)
-        loc.cosLat = m.sqrt(1.0 - loc.sinLat * loc.sinLat)  # Cosine of a latitude is always positive or zero
+        loc.sinLat = np.sin(loc.latitude)
+        loc.cosLat = np.sqrt(1.0 - loc.sinLat * loc.sinLat)  # Cosine of a latitude is always positive or zero
         
         
         # Compute the Julian Day from the date and time:
@@ -121,12 +121,12 @@ class Position:
             year  -= 1
             month += 12
             
-        tmp1 = m.floor(year/100.0)
-        tmp2 = 2 - tmp1 + m.floor(tmp1/4.0)
+        tmp1 = np.floor(year/100.0)
+        tmp2 = 2 - tmp1 + np.floor(tmp1/4.0)
         
         dDay = day + hour/24.0 + minute/1440.0 + second/86400.0
         
-        self.julianDay = m.floor(365.250*(year+4716)) + m.floor(30.60010*(month+1)) + dDay + tmp2 - 1524.5
+        self.julianDay = np.floor(365.250*(year+4716)) + np.floor(30.60010*(month+1)) + dDay + tmp2 - 1524.5
         
         return
     
@@ -147,25 +147,25 @@ class Position:
         l0 = 4.895063168 + 628.331966786 * self.tJC  +  5.291838e-6 * self.tJC2  # Mean longitude
         ma = 6.240060141 + 628.301955152 * self.tJC  -  2.682571e-6 * self.tJC2  # Mean anomaly
         
-        sec = (3.34161088e-2 - 8.40725e-5* self.tJC - 2.443e-7*self.tJC2)*m.sin(ma) + \
-            (3.489437e-4 - 1.76278e-6*self.tJC)*m.sin(2*ma)                                # Sun's equation of the centre
+        sec = (3.34161088e-2 - 8.40725e-5* self.tJC - 2.443e-7*self.tJC2)*np.sin(ma) + \
+            (3.489437e-4 - 1.76278e-6*self.tJC)*np.sin(2*ma)                               # Sun's equation of the centre
         odot = l0 + sec                                                                    # True longitude
         
         
         # Nutation, aberration:
         omg  = 2.1824390725 - 33.7570464271 * self.tJC  + 3.622256e-5 * self.tJC2          # Lon. of Moon's mean ascending node
-        dpsi = -8.338601e-5*m.sin(omg)                                                     # Nutation in longitude
+        dpsi = -8.338601e-5*np.sin(omg)                                                    # Nutation in longitude
         dist = 1.0000010178                                                                # Mean distance to the Sun in AU
         if(computeDistance):
             ecc = 0.016708634 - 0.000042037   * self.tJC  -  0.0000001267 * self.tJC2      # Eccentricity of the Earth's orbit
             nu = ma + sec                                                                  # True anomaly
-            dist = dist*(1.0 - ecc*ecc)/(1.0 + ecc*m.cos(nu))                              # Geocentric distance of the Sun in AU
+            dist = dist*(1.0 - ecc*ecc)/(1.0 + ecc*np.cos(nu))                             # Geocentric distance of the Sun in AU
             
         aber = -9.93087e-5/dist                                                            # Aberration
         
         # Obliquity of the ecliptic and nutation - do this here, since we've already computed many of the ingredients:
         eps0 = 0.409092804222 - 2.26965525e-4*self.tJC - 2.86e-9*self.tJC2                 # Mean obliquity of the ecliptic
-        deps = 4.4615e-5*m.cos(omg)                                                        # Nutation in obliquity
+        deps = 4.4615e-5*np.cos(omg)                                                       # Nutation in obliquity
         
         # Save position parameters:
         self.longitude = (odot + aber + dpsi) % TWO_PI                                     # Apparent geocentric longitude, referred to the true equinox of date
@@ -173,7 +173,7 @@ class Position:
         self.distance = dist                                                               # Distance (AU)
         
         self.obliquity   = eps0 + deps                                                     # True obliquity of the ecliptic
-        self.cosObliquity = m.cos(self.obliquity)                                          # Need the cosine later on
+        self.cosObliquity = np.cos(self.obliquity)                                         # Need the cosine later on
         self.nutationLon = dpsi                                                            # Nutation in longitude
         
         return
@@ -198,11 +198,11 @@ class Position:
         
         """
         
-        sinLon = m.sin(longitude)
-        sinObl = m.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
+        sinLon = np.sin(longitude)
+        sinObl = np.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscension   = m.atan2(cosObliquity*sinLon, m.cos(longitude)) % TWO_PI  # 0 <= azimuth < 2pi
-        self.declination      = m.asin(sinObl*sinLon)
+        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % TWO_PI  # 0 <= azimuth < 2pi
+        self.declination      = np.arcsin(sinObl*sinLon)
         
         return
     
@@ -227,15 +227,15 @@ class Position:
         self.azimuthRefract, sinAlt = self.eq2horiz(location.sinLat,location.cosLat, location.longitude,
                                                     self.rightAscension, self.declination, self.agst)
         
-        alt = m.asin( sinAlt )                                     # Altitude of the Sun above the horizon (rad)
-        cosAlt = m.sqrt(1.0 - sinAlt**2)                           # Cosine of the altitude is always positive or zero
+        alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
+        cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
         self.altitude = alt
         
         # Correct for atmospheric refraction:
-        dalt = 2.967e-4 / m.tan(alt + 3.1376e-3/(alt + 8.92e-2))   # Refraction correction in altitude
+        dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
         dalt *= location.pressure/101.0 * 283.0/location.temperature
         alt += dalt
         # to do: add pressure/temperature dependence
@@ -266,14 +266,14 @@ class Position:
         ha  = agst + longitude - rightAscension                      # Local Hour Angle
         
         # Some preparation, saves ~29%:
-        sinHa  = m.sin(ha)
-        cosHa  = m.cos(ha)
+        sinHa  = np.sin(ha)
+        cosHa  = np.cos(ha)
         
-        sinDec = m.sin(declination)
-        cosDec = m.sqrt(1.0 - sinDec * sinDec)                         # Cosine of a declination is always positive or zero
+        sinDec = np.sin(declination)
+        cosDec = np.sqrt(1.0 - sinDec * sinDec)                         # Cosine of a declination is always positive or zero
         tanDec = sinDec/cosDec
         
-        azimuth = m.atan2( sinHa,  cosHa  * sinLat - tanDec * cosLat )     # 0 <= azimuth < 2pi
+        azimuth = np.arctan2( sinHa,  cosHa  * sinLat - tanDec * cosLat )  # 0 <= azimuth < 2pi
         sinAlt = sinLat * sinDec + cosLat * cosDec * cosHa                 # Sine of the altitude above the horizon
         
         return azimuth, sinAlt
@@ -298,15 +298,15 @@ class Position:
         """
         
         # Multiply used variables:
-        cosAz  = m.cos(azimuth)
-        sinAz  = m.sin(azimuth)                                      # For symmetry
+        cosAz  = np.cos(azimuth)
+        sinAz  = np.sin(azimuth)                                      # For symmetry
         
-        sinAlt = m.sin(altitude)
-        cosAlt = m.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
+        sinAlt = np.sin(altitude)
+        cosAlt = np.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
         tanAlt = sinAlt/cosAlt
         
-        self.hourAngleRefract   = m.atan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
-        self.declinationRefract = m.asin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
+        self.hourAngleRefract   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
+        self.declinationRefract = np.arcsin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
         
         return
     

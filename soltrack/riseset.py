@@ -22,7 +22,6 @@
 
 
 from dataclasses import dataclass
-import math as m
 import numpy as np
 import soltrack as st
 from soltrack.data import PI,TWO_PI, R2D,R2H
@@ -94,13 +93,13 @@ class RiseSet:
         agst0 = pos.agst      # AGST for midnight
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
-        cosH0 = (m.sin(rsa)-m.sin(loc.latitude)*m.sin(pos.declination)) / \
-            (m.cos(loc.latitude)*m.cos(pos.declination))
+        cosH0 = (np.sin(rsa)-np.sin(loc.latitude)*np.sin(pos.declination)) / \
+            (np.cos(loc.latitude)*np.cos(pos.declination))
         
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
         else:
-            h0 = m.acos(cosH0) % PI  # Should probably work without %
+            h0 = np.arccos(cosH0) % PI  # Should probably work without %
             
         
         tmRad[0] = (pos.rightAscension - loc.longitude - pos.agst) % TWO_PI  # Transit time in radians; lon0 > 0 for E
@@ -112,7 +111,7 @@ class RiseSet:
         accur = 1.0e-5        # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
         for evi in range(evMax):  # Loop over transit, rise, set
             iter = 0
-            dTmRad = m.inf
+            dTmRad = np.inf
             
             while(abs(dTmRad) > accur):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
@@ -121,14 +120,14 @@ class RiseSet:
                 pos.computeSunPosition(loc, rsTime, False, useNorthEqualsZero, computeRefrEquatorial, computeDistance)  # useDegrees = False: NEVER use degrees internally!
                 
                 ha  = revPI(th0 + loc.longitude - pos.rightAscension)        # Hour angle: -PI - +PI
-                alt = m.asin(m.sin(loc.latitude)*m.sin(pos.declination) +
-                             m.cos(loc.latitude)*m.cos(pos.declination)*m.cos(ha))  # Altitude
+                alt = np.arcsin(np.sin(loc.latitude)*np.sin(pos.declination) +
+                                np.cos(loc.latitude)*np.cos(pos.declination)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
                     dTmRad = -revPI(ha)  # -PI - +PI
                 else:                 # Rise/set
-                    dTmRad = (alt-rsa)/(m.cos(pos.declination)*m.cos(loc.latitude)*m.sin(ha))
+                    dTmRad = (alt-rsa)/(np.cos(pos.declination)*np.cos(loc.latitude)*np.sin(ha))
                     
                 tmRad[evi] = tmRad[evi] + dTmRad
                 
@@ -143,19 +142,19 @@ class RiseSet:
             
             if(iter > 30):  # Convergence failed
                 print("\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n" % (evi,rsAlt))
-                tmRad[evi] = -m.inf
-                azalt[evi] = -m.inf
+                tmRad[evi] = -np.inf
+                azalt[evi] = -np.inf
             else:               # Result converged, store it
                 if(evi == 0):
                     azalt[evi] = alt                                                                      # Transit altitude
                 else:
-                    azalt[evi] = m.atan2( m.sin(ha), ( m.cos(ha) * m.sin(loc.latitude)  -
-                                                       m.tan(pos.declination) * m.cos(loc.latitude) ) )   # Rise,set hour angle -> azimuth
+                    azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(loc.latitude)  -
+                                                           np.tan(pos.declination) * np.cos(loc.latitude) ) )   # Rise,set hour angle -> azimuth
             
             
             if(tmRad[evi] < 0.0 and abs(rsAlt) < 1.e-9):
-                tmRad[evi] = -m.inf
-                azalt[evi] = -m.inf
+                tmRad[evi] = -np.inf
+                azalt[evi] = -np.inf
                 
         # for-loop evi
         
