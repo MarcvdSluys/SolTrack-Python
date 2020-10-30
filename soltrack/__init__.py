@@ -22,6 +22,7 @@ the [SolTrack homepage](http://soltrack.sf.net).
 
 """
 
+from dataclasses import dataclass
 
 name = "soltrack"
 
@@ -32,15 +33,12 @@ from .position import Position
 from .riseset import RiseSet
 
 
-
+@dataclass
 class SolTrack():
     
+    loc       = Location()
+    time      = Time()
+    pos       = Position()
+    riseSet   = RiseSet()
     
-    def __init__(self):
-        self.loc       = Location()
-        self.time      = Time()
-        self.pos       = Position()
-        self.riseSet   = RiseSet()
-        
-        return
     

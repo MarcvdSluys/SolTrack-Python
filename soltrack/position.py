@@ -20,19 +20,15 @@
 
 """
 
+from dataclasses import dataclass
 import math as m
 from soltrack.data import PI, TWO_PI, R2D
 
 
-
+@dataclass
 class Position:
     """Class containing the position of the Sun and related variables."""
     
-    def __init__(self):
-        
-        return
-    
-
     def computeSunPosition(self, location, time,  useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=False, computeDistance=False):
         
         """

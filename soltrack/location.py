@@ -21,11 +21,12 @@
 """
 
 
+from dataclasses import dataclass
+
+
+@dataclass
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
-    
-    def __init__(self):
-        return
     
     
     def setLocation(self, longitude, latitude, pressure=101.0, temperature=283.0):
