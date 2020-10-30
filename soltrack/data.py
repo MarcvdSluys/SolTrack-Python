@@ -20,11 +20,18 @@
 
 """
 
-# Global variables:
-PI             = 3.14159265358979323846    # Pi
-TWO_PI         = 6.28318530717958647693    # 2 pi
-R2D            = 57.2957795130823208768    # Radians to degrees conversion factor
-R2H            = 3.81971863420548805845    # Radians to hours conversion factor
+from dataclasses import dataclass
+
+
+@dataclass
+class Data:
+    """Class containing SolTrack data."""
+    
+    # Global variables:
+    PI: float         = 3.14159265358979323846    # Pi
+    TWO_PI: float     = 6.28318530717958647693    # 2 pi
+    R2D: float        = 57.2957795130823208768    # Radians to degrees conversion factor
+    R2H: float        = 3.81971863420548805845    # Radians to hours conversion factor
 
 
 

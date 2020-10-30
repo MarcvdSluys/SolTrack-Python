@@ -22,7 +22,9 @@
 
 from dataclasses import dataclass
 import numpy as np
-from soltrack.data import PI, TWO_PI, R2D
+
+from .data import Data
+data = Data()
 
 
 @dataclass
@@ -53,8 +55,8 @@ class Position:
         import copy
         loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
         if(useDegrees):
-            loc.longitude /= R2D
-            loc.latitude  /= R2D
+            loc.longitude /= data.R2D
+            loc.latitude  /= data.R2D
         
         # Compute these once and reuse:
         loc.sinLat = np.sin(loc.latitude)
@@ -168,7 +170,7 @@ class Position:
         deps = 4.4615e-5*np.cos(omg)                                                       # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % TWO_PI                                     # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % data.TWO_PI                                # Apparent geocentric longitude, referred to the true equinox of date
         
         self.distance = dist                                                               # Distance (AU)
         
@@ -201,7 +203,7 @@ class Position:
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % TWO_PI  # 0 <= azimuth < 2pi
+        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % data.TWO_PI  # 0 <= azimuth < 2pi
         self.declination      = np.arcsin(sinObl*sinLon)
         
         return
@@ -332,10 +334,10 @@ class Position:
         
         """
         
-        self.azimuthRefract = (azimuthRefract + PI) % TWO_PI                    # Add PI to set North=0
+        self.azimuthRefract = (azimuthRefract + data.PI) % data.TWO_PI                    # Add PI to set North=0
         
         if(computeRefrEquatorial):
-            self.hourAngleRefract = (hourAngleRefract + PI) % TWO_PI            # Add PI to set North=0
+            self.hourAngleRefract = (hourAngleRefract + data.PI) % data.TWO_PI            # Add PI to set North=0
             
         return
     
@@ -351,17 +353,17 @@ class Position:
         
         """
         
-        self.longitude *= R2D
-        self.rightAscension *= R2D
-        self.declination *= R2D
+        self.longitude *= data.R2D
+        self.rightAscension *= data.R2D
+        self.declination *= data.R2D
         
-        self.altitude *= R2D
-        self.azimuthRefract *= R2D
-        self.altitudeRefract *= R2D
+        self.altitude *= data.R2D
+        self.azimuthRefract *= data.R2D
+        self.altitudeRefract *= data.R2D
         
         if(computeRefrEquatorial):
-            self.hourAngleRefract *= R2D
-            self.declinationRefract *= R2D
+            self.hourAngleRefract *= data.R2D
+            self.declinationRefract *= data.R2D
             
         return
 

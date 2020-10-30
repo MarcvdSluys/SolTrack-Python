@@ -26,7 +26,7 @@ from dataclasses import dataclass
 
 name = "soltrack"
 
-# from .data import *
+from .data import Data
 from .location import Location
 from .time import Time
 from .position import Position
@@ -36,6 +36,7 @@ from .riseset import RiseSet
 @dataclass
 class SolTrack():
     
+    data      = Data()
     loc       = Location()
     time      = Time()
     pos       = Position()
