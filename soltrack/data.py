@@ -24,7 +24,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Data:
+class Constants:
     """Class containing SolTrack data."""
     
     # Global variables:
