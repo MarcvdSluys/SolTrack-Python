@@ -23,7 +23,7 @@
 from dataclasses import dataclass
 import numpy as np
 
-from .data import Constants
+from .data import Constants, Parameters
 cst = Constants()
 
 
@@ -31,7 +31,10 @@ cst = Constants()
 class Position:
     """Class containing the position of the Sun and related variables."""
     
-    def computeSunPosition(self, location, time,  useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=False, computeDistance=False):
+    param: Parameters
+    
+    
+    def computeSunPosition(self, location, time):
         
         """
         Main function to compute the position of the Sun.
@@ -54,7 +57,7 @@ class Position:
         # In C, a local copy of location is made.  With Python objects, we need a deep copy.
         import copy
         loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
-        if(useDegrees):
+        if(self.param.useDegrees):
             loc.longitude /= cst.R2D
             loc.latitude  /= cst.R2D
         
@@ -74,7 +77,7 @@ class Position:
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
-        self.computeLongitude(computeDistance)
+        self.computeLongitude(self.param.computeDistance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
         self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
@@ -84,17 +87,17 @@ class Position:
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
-        if(computeRefrEquatorial):
+        if(self.param.computeRefrEquatorial):
             self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
                                                self.altitudeRefract)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
-        if(useNorthEqualsZero):
-            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract, computeRefrEquatorial)
+        if(self.param.useNorthEqualsZero):
+            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract, self.param.computeRefrEquatorial)
             
         # If the user wants degrees, convert final results from radians to degrees:
-        if(useDegrees):
-            self.convertRadiansToDegrees(computeRefrEquatorial)
+        if(self.param.useDegrees):
+            self.convertRadiansToDegrees(self.param.computeRefrEquatorial)
             
         return
     

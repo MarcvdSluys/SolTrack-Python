@@ -34,14 +34,13 @@ from .riseset import RiseSet
 
 
 @dataclass
-class SolTrack():
+class SolTrack:
     
     cst       = Constants()
     param     = Parameters()
     
     loc       = Location()
     time      = Time()
-    pos       = Position()
-    riseSet   = RiseSet()
-    
+    pos       = Position(param)
+    riseSet   = RiseSet(param)
     

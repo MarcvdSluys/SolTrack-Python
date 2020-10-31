@@ -44,8 +44,8 @@ class Parameters:
     computeDistance: bool        = False;   """Compute the distance to the Sun"""
     
     
-    def setParameters(self, useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=False,
-                      computeDistance=False):
+    def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
+                      computeDistance=None):
         """Set the SolTrack parameters (settings).
         
         Parameters:
@@ -55,9 +55,9 @@ class Parameters:
           computeDistance (bool):         Compute the distance to the Sun.
         """
         
-        self.useDegrees             = useDegrees
-        self.useNorthEqualsZero     = useNorthEqualsZero
-        self.computeRefrEquatorial  = computeRefrEquatorial
-        self.computeDistance        = computeDistance
+        if(useDegrees):             self.useDegrees             = useDegrees
+        if(useNorthEqualsZero):     self.useNorthEqualsZero     = useNorthEqualsZero
+        if(computeRefrEquatorial):  self.computeRefrEquatorial  = computeRefrEquatorial
+        if(computeDistance):        self.computeDistance        = computeDistance
         
         return
