@@ -60,7 +60,7 @@ class Position:
         
         # Compute these once and reuse:
         loc.sinLat = np.sin(loc.latitude)
-        loc.cosLat = np.sqrt(1.0 - loc.sinLat * loc.sinLat)  # Cosine of a latitude is always positive or zero
+        loc.cosLat = np.sqrt(1.0 - loc.sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
         # Compute the Julian Day from the date and time:
@@ -161,7 +161,7 @@ class Position:
         if(computeDistance):
             ecc = 0.016708634 - 0.000042037   * self.tJC  -  0.0000001267 * self.tJC2      # Eccentricity of the Earth's orbit
             nu = ma + sec                                                                  # True anomaly
-            dist = dist*(1.0 - ecc*ecc)/(1.0 + ecc*np.cos(nu))                             # Geocentric distance of the Sun in AU
+            dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                             # Geocentric distance of the Sun in AU
             
         aber = -9.93087e-5/dist                                                            # Aberration
         
@@ -272,7 +272,7 @@ class Position:
         cosHa  = np.cos(ha)
         
         sinDec = np.sin(declination)
-        cosDec = np.sqrt(1.0 - sinDec * sinDec)                         # Cosine of a declination is always positive or zero
+        cosDec = np.sqrt(1.0 - sinDec**2)                         # Cosine of a declination is always positive or zero
         tanDec = sinDec/cosDec
         
         azimuth = np.arctan2( sinHa,  cosHa  * sinLat - tanDec * cosLat )  # 0 <= azimuth < 2pi
