@@ -43,11 +43,6 @@ class Position:
           location          (Location):  Class containing the geographic location to compute the Sun's position for.
           time                  (Time):  Class containing date and time to compute the position for, in UT.
         
-          useDegrees            (bool):  Use degrees for input and output angular variables, rather than radians (optional, default=False).
-          useNorthEqualsZero    (bool):  Use the definition where azimuth=0 denotes north, rather than south (optional, default=False).
-          computeRefrEquatorial (bool):  Compute refraction correction for equatorial coordinates (optional, default=False).
-          computeDistance       (bool):  Compute distance to the Sun (optional, default=False).
-        
         Returns:
           (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
         
@@ -93,11 +88,11 @@ class Position:
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(self.param.useNorthEqualsZero):
-            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract, self.param.computeRefrEquatorial)
+            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param.useDegrees):
-            self.convertRadiansToDegrees(self.param.computeRefrEquatorial)
+            self.convertRadiansToDegrees()
             
         return
     
@@ -219,7 +214,6 @@ class Position:
         
         Parameters:
           location (Location):  Class containing the geographic location of the observer (rad).
-          position (Position):  Class containing the position of the Sun (rad, I/O).
         
         """
         
@@ -317,7 +311,7 @@ class Position:
     
     
     
-    def setNorthToZero(self, azimuthRefract, hourAngleRefract, computeRefrEquatorial):
+    def setNorthToZero(self, azimuthRefract, hourAngleRefract):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -327,7 +321,6 @@ class Position:
         Parameters:
           azimuth              (float):  Azimuth ("wind direction") of the Sun (rad).
           hourAngle            (float):  Hour angle of the Sun (rad).
-          computeRefrEquatorial (bool):  Compute refraction correction for equatorial coordinates.
         
         Returns: 
           tuple (float,float):  Tuple containing (azimuth, hourAngle):
@@ -339,20 +332,17 @@ class Position:
         
         self.azimuthRefract = (azimuthRefract + cst.PI) % cst.TWO_PI                    # Add PI to set North=0
         
-        if(computeRefrEquatorial):
+        if(self.param.computeRefrEquatorial):
             self.hourAngleRefract = (hourAngleRefract + cst.PI) % cst.TWO_PI            # Add PI to set North=0
             
         return
     
     
-    def convertRadiansToDegrees(self, computeRefrEquatorial):
+    def convertRadiansToDegrees(self):
         """Convert final results from radians to degrees.
         
         Note:
           - Does not touch intermediate results.
-        
-        position          (Position):  Class containing Sun position (I/O).
-        computeRefrEquatorial (bool):  Compute refraction correction for equatorial coordinates.
         
         """
         
@@ -364,7 +354,7 @@ class Position:
         self.azimuthRefract *= cst.R2D
         self.altitudeRefract *= cst.R2D
         
-        if(computeRefrEquatorial):
+        if(self.param.computeRefrEquatorial):
             self.hourAngleRefract *= cst.R2D
             self.declinationRefract *= cst.R2D
             

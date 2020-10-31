@@ -46,8 +46,6 @@ class RiseSet:
           location           (Location):  Class containing the geographic location to compute the Sun's rise and set times for.
           time               (Time):      Class containing date and time to compute the position for, in UT.
           rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
-          useDegrees         (bool):      Use degrees for input and output angular variables, rather than radians (optional, default=False).
-          useNorthEqualsZero (bool):      Use the definition where azimuth=0 denotes north, rather than south (optional, default=False).
         
         Returns:
           (RiseSet):   Class containing the Sun's rise, transit and set data.
