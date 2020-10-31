@@ -26,7 +26,7 @@ from dataclasses import dataclass
 
 name = "soltrack"
 
-from .data import Constants
+from .data import Constants, Parameters
 from .location import Location
 from .time import Time
 from .position import Position
@@ -37,6 +37,8 @@ from .riseset import RiseSet
 class SolTrack():
     
     cst       = Constants()
+    param     = Parameters()
+    
     loc       = Location()
     time      = Time()
     pos       = Position()

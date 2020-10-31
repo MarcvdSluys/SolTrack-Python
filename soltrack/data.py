@@ -25,13 +25,39 @@ from dataclasses import dataclass
 
 @dataclass
 class Constants:
-    """Class containing SolTrack data."""
+    """Class containing SolTrack constants."""
     
-    # Global variables:
-    PI: float         = 3.14159265358979323846    # Pi
-    TWO_PI: float     = 6.28318530717958647693    # 2 pi
-    R2D: float        = 57.2957795130823208768    # Radians to degrees conversion factor
-    R2H: float        = 3.81971863420548805845    # Radians to hours conversion factor
+    PI: float         = 3.14159265358979323846;   """Pi"""
+    TWO_PI: float     = 6.28318530717958647693;   """2 pi"""
+    R2D: float        = 57.2957795130823208768;   """Radians to degrees conversion factor"""
+    R2H: float        = 3.81971863420548805845;   """Radians to hours conversion factor"""
 
 
 
+@dataclass
+class Parameters:
+    """Class containing SolTrack parameters/settings."""
+    
+    useDegrees: bool             = False;   """Input (geographic position) and output are in degrees"""
+    useNorthEqualsZero: bool     = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East"""
+    computeRefrEquatorial: bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)"""
+    computeDistance: bool        = False;   """Compute the distance to the Sun"""
+    
+    
+    def setParameters(self, useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=False,
+                      computeDistance=False):
+        """Set the SolTrack parameters (settings).
+        
+        Parameters:
+          useDegrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
+          useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
+          computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
+          computeDistance (bool):         Compute the distance to the Sun.
+        """
+        
+        self.useDegrees             = useDegrees
+        self.useNorthEqualsZero     = useNorthEqualsZero
+        self.computeRefrEquatorial  = computeRefrEquatorial
+        self.computeDistance        = computeDistance
+        
+        return
