@@ -28,14 +28,13 @@ import soltrack as st
 from soltrack.time import Time
 
 from .data import Constants, Parameters
-cst = Constants()
-# param = Parameters()
 
 
 @dataclass
 class RiseSet:
-    """Class containing rise,transit and set times of the Sun and their azimuths/altitudes."""
+    """Class containing attributes and methods to compute the rise,transit and set times of the Sun and their azimuths/altitudes."""
     
+    cst: Constants
     param: Parameters
     
     
@@ -72,15 +71,15 @@ class RiseSet:
         # For internal use, we want radians and south=0.  We need equatorial coordinates, but not the distance: - doesn't work!
         # self.param.setParameters(useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
         
-        rsa = -0.8333/cst.R2D                   # Standard altitude for the Sun in radians
+        rsa = -0.8333/self.cst.R2D              # Standard altitude for the Sun in radians
         if(abs(rsAlt) > 1.e-9): rsa = rsAlt     # Use a user-specified altitude
         
         # If the used uses degrees, convert the geographic location to radians:
         # This was a local variable llocation in C
         loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be modified here
         if(origParam.useDegrees):  # We want radians.  If the original position was in degrees, convert it here.
-            loc.longitude /= cst.R2D
-            loc.latitude  /= cst.R2D
+            loc.longitude /= self.cst.R2D
+            loc.latitude  /= self.cst.R2D
 
         
         # Set date and time to midnight UT for the desired day:
@@ -95,7 +94,7 @@ class RiseSet:
         rsTime.second = 0.0
         
         # Compute the Sun's position.  Returns a Position object:
-        pos = st.Position(self.param)
+        pos = st.Position(self.cst, self.param)
         pos.computeSunPosition(loc, rsTime)
         
         agst0 = pos.agst      # AGST for midnight
@@ -106,13 +105,13 @@ class RiseSet:
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
         else:
-            h0 = np.arccos(cosH0) % cst.PI  # Should probably work without %
+            h0 = np.arccos(cosH0) % self.cst.PI  # Should probably work without %
             
         
-        tmRad[0] = (pos.rightAscension - loc.longitude - pos.agst) % cst.TWO_PI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (pos.rightAscension - loc.longitude - pos.agst) % self.cst.TWO_PI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
-            tmRad[1] = (tmRad[0] - h0) % cst.TWO_PI   # Rise time in radians
-            tmRad[2] = (tmRad[0] + h0) % cst.TWO_PI   # Set time in radians
+            tmRad[1] = (tmRad[0] - h0) % self.cst.TWO_PI   # Rise time in radians
+            tmRad[2] = (tmRad[0] + h0) % self.cst.TWO_PI   # Set time in radians
             
             
         accur = 1.0e-5        # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
@@ -123,16 +122,16 @@ class RiseSet:
             while(abs(dTmRad) > accur):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
                 
-                rsTime.second = tmRad[evi]*cst.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
+                rsTime.second = tmRad[evi]*self.cst.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 pos.computeSunPosition(loc, rsTime)
                 
-                ha  = revPI(th0 + loc.longitude - pos.rightAscension)        # Hour angle: -PI - +PI
+                ha  = self.revPI(th0 + loc.longitude - pos.rightAscension)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(loc.latitude)*np.sin(pos.declination) +
                                 np.cos(loc.latitude)*np.cos(pos.declination)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
-                    dTmRad = -revPI(ha)  # -PI - +PI
+                    dTmRad = -self.revPI(ha)  # -PI - +PI
                 else:                 # Rise/set
                     dTmRad = (alt-rsa)/(np.cos(pos.declination)*np.cos(loc.latitude)*np.sin(ha))
                     
@@ -175,21 +174,21 @@ class RiseSet:
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
         if(self.param.useNorthEqualsZero):
-            azalt[1] = (azalt[1] + cst.PI) % cst.TWO_PI  # Add PI and fold between 0 and 2pi
-            azalt[2] = (azalt[2] + cst.PI) % cst.TWO_PI  # Add PI and fold between 0 and 2pi
+            azalt[1] = (azalt[1] + self.cst.PI) % self.cst.TWO_PI  # Add PI and fold between 0 and 2pi
+            azalt[2] = (azalt[2] + self.cst.PI) % self.cst.TWO_PI  # Add PI and fold between 0 and 2pi
         
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
         if(self.param.useDegrees):
-            azalt[0] *= cst.R2D   # Transit altitude
-            azalt[1] *= cst.R2D   # Rise azimuth
-            azalt[2] *= cst.R2D   # Set azimuth
+            azalt[0] *= self.cst.R2D   # Transit altitude
+            azalt[1] *= self.cst.R2D   # Rise azimuth
+            azalt[2] *= self.cst.R2D   # Set azimuth
             
             
         # Store results:
-        self.transitTime     = tmRad[0]*cst.R2H  # Transit time - radians -> hours
-        self.riseTime        = tmRad[1]*cst.R2H  # Rise time - radians -> hours
-        self.setTime         = tmRad[2]*cst.R2H  # Set time - radians -> hours
+        self.transitTime     = tmRad[0]*self.cst.R2H  # Transit time - radians -> hours
+        self.riseTime        = tmRad[1]*self.cst.R2H  # Rise time - radians -> hours
+        self.setTime         = tmRad[2]*self.cst.R2H  # Set time - radians -> hours
         
         self.transitAltitude = azalt[0]      # Transit altitude
         self.riseAzimuth     = azalt[1]      # Rise azimuth
@@ -199,14 +198,14 @@ class RiseSet:
     
     
     
-def revPI(angle):
-    """Fold an angle in radians to take a value between -PI and +PI.
+    def revPI(self, angle):
+        """Fold an angle in radians to take a value between -PI and +PI.
+        
+        Parameters:
+          angle (float):  Angle to fold (rad).
+        
+        """
+        
+        return ((angle + self.cst.PI) % self.cst.TWO_PI) - self.cst.PI
     
-    Parameters:
-      angle (float):  Angle to fold (rad).
-    
-    """
-    
-    return ((angle + cst.PI) % cst.TWO_PI) - cst.PI
-
 

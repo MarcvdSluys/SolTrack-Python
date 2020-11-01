@@ -24,13 +24,13 @@ from dataclasses import dataclass
 import numpy as np
 
 from .data import Constants, Parameters
-cst = Constants()
 
 
 @dataclass
 class Position:
-    """Class containing the position of the Sun and related variables."""
+    """Class containing the position of the Sun and related attributes and methods."""
     
+    cst: Constants
     param: Parameters
     
     
@@ -53,8 +53,8 @@ class Position:
         import copy
         loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
         if(self.param.useDegrees):
-            loc.longitude /= cst.R2D
-            loc.latitude  /= cst.R2D
+            loc.longitude /= self.cst.R2D
+            loc.latitude  /= self.cst.R2D
         
         # Compute these once and reuse:
         loc.sinLat = np.sin(loc.latitude)
@@ -168,7 +168,7 @@ class Position:
         deps = 4.4615e-5*np.cos(omg)                                                       # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % cst.TWO_PI                                # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % self.cst.TWO_PI                            # Apparent geocentric longitude, referred to the true equinox of date
         
         self.distance = dist                                                               # Distance (AU)
         
@@ -201,7 +201,7 @@ class Position:
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % cst.TWO_PI  # 0 <= azimuth < 2pi
+        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self.cst.TWO_PI  # 0 <= azimuth < 2pi
         self.declination      = np.arcsin(sinObl*sinLon)
         
         return
@@ -330,10 +330,10 @@ class Position:
         
         """
         
-        self.azimuthRefract = (azimuthRefract + cst.PI) % cst.TWO_PI                    # Add PI to set North=0
+        self.azimuthRefract = (azimuthRefract + self.cst.PI) % self.cst.TWO_PI                    # Add PI to set North=0
         
         if(self.param.computeRefrEquatorial):
-            self.hourAngleRefract = (hourAngleRefract + cst.PI) % cst.TWO_PI            # Add PI to set North=0
+            self.hourAngleRefract = (hourAngleRefract + self.cst.PI) % self.cst.TWO_PI            # Add PI to set North=0
             
         return
     
@@ -346,17 +346,17 @@ class Position:
         
         """
         
-        self.longitude *= cst.R2D
-        self.rightAscension *= cst.R2D
-        self.declination *= cst.R2D
+        self.longitude *= self.cst.R2D
+        self.rightAscension *= self.cst.R2D
+        self.declination *= self.cst.R2D
         
-        self.altitude *= cst.R2D
-        self.azimuthRefract *= cst.R2D
-        self.altitudeRefract *= cst.R2D
+        self.altitude *= self.cst.R2D
+        self.azimuthRefract *= self.cst.R2D
+        self.altitudeRefract *= self.cst.R2D
         
         if(self.param.computeRefrEquatorial):
-            self.hourAngleRefract *= cst.R2D
-            self.declinationRefract *= cst.R2D
+            self.hourAngleRefract *= self.cst.R2D
+            self.declinationRefract *= self.cst.R2D
             
         return
 
