@@ -53,11 +53,11 @@ class Position(Constants):
         import copy
         loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
         if(self.param.useDegrees):
-            loc.longitude /= self.R2D
-            loc.latitude  /= self.R2D
+            loc.geoLongitude /= self.R2D
+            loc.geoLatitude  /= self.R2D
         
         # Compute these once and reuse:
-        loc.sinLat = np.sin(loc.latitude)
+        loc.sinLat = np.sin(loc.geoLatitude)
         loc.cosLat = np.sqrt(1.0 - loc.sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
@@ -222,7 +222,7 @@ class Position(Constants):
         
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
-        self.azimuthRefract, sinAlt = self.eq2horiz(location.sinLat,location.cosLat, location.longitude,
+        self.azimuthRefract, sinAlt = self.eq2horiz(location.sinLat,location.cosLat, location.geoLongitude,
                                                     self.rightAscension, self.declination, self.agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)

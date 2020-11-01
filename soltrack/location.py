@@ -29,9 +29,9 @@ class Location:
     """Class containing the geographic location to compute the Sun position for."""
     
     
-    def setLocation(self, longitude, latitude, pressure=101.0, temperature=283.0):
-        self.longitude = longitude
-        self.latitude  = latitude
+    def setLocation(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
+        self.geoLongitude = geoLongitude
+        self.geoLatitude  = geoLatitude
         
         self.pressure    = pressure
         self.temperature = temperature
