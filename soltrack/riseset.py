@@ -94,7 +94,7 @@ class RiseSet:
         rsTime.second = 0.0
         
         # Compute the Sun's position.  Returns a Position object:
-        pos = st.Position(self.cst, self.param)
+        pos = st.Position(self.param)
         pos.computeSunPosition(loc, rsTime)
         
         agst0 = pos.agst      # AGST for midnight

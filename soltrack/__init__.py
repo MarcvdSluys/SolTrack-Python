@@ -42,6 +42,6 @@ class SolTrack:
     loc       = Location()
     time      = Time()
     
-    pos       = Position(cst, param)
+    pos       = Position(param)
     riseSet   = RiseSet(cst, param)
     
