@@ -47,7 +47,7 @@ class Position(Constants):
           (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
         
         """
-        
+                
         # If the used uses degrees, convert the geographic location to radians:
         # In C, a local copy of location is made.  With Python objects, we need a deep copy.
         import copy
@@ -64,8 +64,7 @@ class Position(Constants):
         # Compute the Julian Day from the date and time:
         self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute, time.second)
         
-        
-        # Derived expressions of time:
+        # Derived expressions for time, to be reused:
         self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
         self.tJC  = self.tJD/36525.0                             # Time in Julian centuries since 2000.0
         self.tJC2 = self.tJC**2                                  # T^2

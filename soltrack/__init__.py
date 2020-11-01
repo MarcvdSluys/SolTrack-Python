@@ -22,9 +22,9 @@ the [SolTrack homepage](http://soltrack.sf.net).
 
 """
 
-from dataclasses import dataclass
-
 name = "soltrack"
+
+from dataclasses import dataclass
 
 from .data import Constants, Parameters
 from .location import Location
@@ -34,8 +34,10 @@ from .riseset import RiseSet
 
 
 @dataclass
-class SolTrack:
-
+# class SolTrack(Parameters, Location, Time, Position, RiseSet):
+class SolTrack(Location, Time):
+    
+    
     def __init__(self, longitude,latitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
         """Construct a SolTrack object with specified geographical location and parameters (settings).
         
@@ -49,16 +51,26 @@ class SolTrack:
           computeDistance (bool):         Compute the distance to the Sun.
 
         """
-                
-        self.cst       = Constants()
+        
+        # self.cst       = Constants()
+        
         self.param     = Parameters()
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
+        # Parameters.__init__(self)
+        # self.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
         
-        self.loc       = Location()
-        self.loc.setLocation(longitude, latitude)
+        Location.__init__(self)
+        # self.loc       = Location()
+        # print(self.loc.latitude)
+        self.setLocation(longitude, latitude)
+        # print(self.latitude)
         
-        self.time      = Time()
+        Time.__init__(self)
+        # self.time      = Time()
         
+        # Position.__init__(self, self.param)
         self.pos       = Position(self.param)
+        
+        # RiseSet.__init__(self, self.param)
         self.riseSet   = RiseSet(self.param)
         
