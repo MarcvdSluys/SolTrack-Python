@@ -36,13 +36,27 @@ from .riseset import RiseSet
 @dataclass
 class SolTrack:
 
-    def __init__(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+    def __init__(self, longitude,latitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+        """Construct a SolTrack object with specified geographical location and parameters (settings).
+        
+        Parameters:
+          longitude (float):              Geographical longitude of the observer or installation (radians or degrees, depending on useDegrees).
+          latitude (float):               Geographical latitude of the observer or installation (radians or degrees, depending on useDegrees).
+        
+          useDegrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
+          useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
+          computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
+          computeDistance (bool):         Compute the distance to the Sun.
+
+        """
                 
         self.cst       = Constants()
         self.param     = Parameters()
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
         
         self.loc       = Location()
+        self.loc.setLocation(longitude, latitude)
+        
         self.time      = Time()
         
         self.pos       = Position(self.param)

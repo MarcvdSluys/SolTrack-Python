@@ -64,15 +64,17 @@ class RiseSet(Constants):
         azalt = np.zeros(3)
         alt=0.0;  ha=0.0; h0=0.0
         
-        # Need a local SolTrack instance for the same location, but with different settings and time:
-        st = soltrack.SolTrack(useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=True,
-                               computeDistance=False)
-        
-        # Use the same location:
+        # Need a local SolTrack instance for the same location (but in radians!), but with different settings
+        # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
+        # positions:
         if(self.param.useDegrees):
-            st.loc.setLocation(location.longitude/self.R2D, location.latitude/self.R2D)  # longitude (>0: east of Greenwich),  latitude (>0: northern hemisphere)
+            st = soltrack.SolTrack(location.longitude/self.R2D, location.latitude/self.R2D, useDegrees=False,
+                                   useNorthEqualsZero=False, computeRefrEquatorial=True,
+                                   computeDistance=False)
         else:
-            st.loc.setLocation(location.longitude, location.latitude)  # longitude (>0: east of Greenwich),  latitude (>0: northern hemisphere)
+            st = soltrack.SolTrack(location.longitude, location.latitude, useDegrees=False,
+                                   useNorthEqualsZero=False, computeRefrEquatorial=True,
+                                   computeDistance=False)
         
         # Set date and time to midnight of the desired date:
         st.time.setTime(time.year, time.month, time.day, 0,0,0.0)
