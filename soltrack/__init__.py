@@ -35,13 +35,16 @@ from .riseset import RiseSet
 
 @dataclass
 class SolTrack:
-    
-    cst       = Constants()
-    param     = Parameters()
-    
-    loc       = Location()
-    time      = Time()
-    
-    pos       = Position(param)
-    riseSet   = RiseSet(param)
-    
+
+    def __init__(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+                
+        self.cst       = Constants()
+        self.param     = Parameters()
+        self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
+        
+        self.loc       = Location()
+        self.time      = Time()
+        
+        self.pos       = Position(self.param)
+        self.riseSet   = RiseSet(self.param)
+        
