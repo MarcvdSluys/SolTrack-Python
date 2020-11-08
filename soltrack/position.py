@@ -34,69 +34,6 @@ class Position(Constants):
         self.param = param
     
     
-    def computeSunPosition(self, location, time):
-        
-        """
-        Main function to compute the position of the Sun.
-        
-        Parameters:
-          location          (Location):  Class containing the geographic location to compute the Sun's position for.
-          time                  (Time):  Class containing date and time to compute the position for, in UT.
-        
-        Returns:
-          (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
-        
-        """
-                
-        # If the used uses degrees, convert the geographic location to radians:
-        # In C, a local copy of location is made.  With Python objects, we need a deep copy.
-        import copy
-        loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
-        if(self.param.useDegrees):
-            loc.geoLongitude /= self.R2D
-            loc.geoLatitude  /= self.R2D
-        
-        # Compute these once and reuse:
-        loc.sinLat = np.sin(loc.geoLatitude)
-        loc.cosLat = np.sqrt(1.0 - loc.sinLat**2)  # Cosine of a latitude is always positive or zero
-        
-        
-        # Compute the Julian Day from the date and time:
-        self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute, time.second)
-        
-        # Derived expressions for time, to be reused:
-        self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
-        self.tJC  = self.tJD/36525.0                             # Time in Julian centuries since 2000.0
-        self.tJC2 = self.tJC**2                                  # T^2
-        
-        
-        # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
-        self.computeLongitude(self.param.computeDistance)
-        
-        # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
-        
-        # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
-        self.convertEquatorialToHorizontal(loc)
-        
-        
-        # Convert the corrected horizontal coordinates back to equatorial coordinates:
-        if(self.param.computeRefrEquatorial):
-            self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
-                                               self.altitudeRefract)
-            
-        # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
-        if(self.param.useNorthEqualsZero):
-            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
-            
-        # If the user wants degrees, convert final results from radians to degrees:
-        if(self.param.useDegrees):
-            self.convertRadiansToDegrees()
-            
-        return
-    
-    
-    
     def computeJulianDay(self, year, month, day,  hour, minute, second):
         """Compute the Julian Day from the date and time.
         
@@ -358,4 +295,16 @@ class Position(Constants):
             self.declinationRefract *= self.R2D
             
         return
+    
+    
+    def revPI(self, angle):
+        """Fold an angle in radians to take a value between -PI and +PI.
+        
+        Parameters:
+          angle (float):  Angle to fold (rad).
+        
+        """
+        
+        return ((angle + self.PI) % self.TWO_PI) - self.PI
+    
 

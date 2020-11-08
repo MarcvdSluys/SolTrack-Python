@@ -25,6 +25,7 @@ the [SolTrack homepage](http://soltrack.sf.net).
 name = "soltrack"
 
 from dataclasses import dataclass
+import numpy as np
 
 from .data import Constants, Parameters
 from .location import Location
@@ -35,7 +36,7 @@ from .riseset import RiseSet
 
 @dataclass
 # class SolTrack(Parameters, Location, Time, Position, RiseSet):
-class SolTrack(Location, Time):
+class SolTrack(Location, Time, Position):
     
     
     def __init__(self, longitude,latitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
@@ -52,7 +53,7 @@ class SolTrack(Location, Time):
 
         """
         
-        # self.cst       = Constants()
+        self.cst       = Constants()
         
         self.param     = Parameters()
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
@@ -74,3 +75,210 @@ class SolTrack(Location, Time):
         # RiseSet.__init__(self, self.param)
         self.riseSet   = RiseSet(self.param)
         
+        
+        
+        
+    def computeSunPosition(self, location, time):
+        
+        """
+        Main function to compute the position of the Sun.
+        
+        Parameters:
+          location          (Location):  Class containing the geographic location to compute the Sun's position for.
+          time                  (Time):  Class containing date and time to compute the position for, in UT.
+        
+        Returns:
+          (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
+        
+        """
+                
+        # If the used uses degrees, convert the geographic location to radians:
+        # In C, a local copy of location is made.  With Python objects, we need a deep copy.
+        import copy
+        loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
+        if(self.param.useDegrees):
+            loc.geoLongitude /= self.cst.R2D
+            loc.geoLatitude  /= self.cst.R2D
+        
+        # Compute these once and reuse:
+        loc.sinLat = np.sin(loc.geoLatitude)
+        loc.cosLat = np.sqrt(1.0 - loc.sinLat**2)  # Cosine of a latitude is always positive or zero
+        
+        
+        # Compute the Julian Day from the date and time:
+        self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute, time.second)
+        
+        # Derived expressions for time, to be reused:
+        self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
+        self.tJC  = self.tJD/36525.0                             # Time in Julian centuries since 2000.0
+        self.tJC2 = self.tJC**2                                  # T^2
+        
+        
+        # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
+        self.computeLongitude(self.param.computeDistance)
+        
+        # Convert ecliptic coordinates to geocentric equatorial coordinates:
+        self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
+        
+        # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
+        self.convertEquatorialToHorizontal(loc)
+        
+        
+        # Convert the corrected horizontal coordinates back to equatorial coordinates:
+        if(self.param.computeRefrEquatorial):
+            self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
+                                               self.altitudeRefract)
+            
+        # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
+        if(self.param.useNorthEqualsZero):
+            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
+            
+        # If the user wants degrees, convert final results from radians to degrees:
+        if(self.param.useDegrees):
+            self.convertRadiansToDegrees()
+            
+        return
+    
+    
+    
+    def computeSunRiseSet(self, location, time, rsAlt=0.0):
+        """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
+        
+        Parameters:
+          location           (Location):  Class containing the geographic location to compute the Sun's rise and set times for.
+          time               (Time):      Class containing date and time to compute the position for, in UT.
+          rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
+        
+        Returns:
+          (RiseSet):   Class containing the Sun's rise, transit and set data.
+        
+        Note:
+          - if rsAlt == 0.0, actual rise and set times are computed
+          - if rsAlt != 0.0, the routine calculates when alt = rsAlt is reached
+          - returns times, rise/set azimuth and transit altitude in the class riseSet
+         
+          See:
+            - subroutine riset() in riset.f90 from libTheSky (libthesky.sf.net) for more info
+        
+        """
+        
+        rsa = -0.8333/self.cst.R2D              # Standard altitude for the Sun in radians
+        if(abs(rsAlt) > 1.e-9): rsa = rsAlt     # Use a user-specified altitude
+        
+        tmRad = np.zeros(3)
+        azalt = np.zeros(3)
+        alt=0.0;  ha=0.0; h0=0.0
+        
+        # Need a local SolTrack instance for the same location (but in radians!), but with different settings
+        # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
+        # positions:
+        if(self.param.useDegrees):
+            st = SolTrack(location.geoLongitude/self.cst.R2D, location.geoLatitude/self.cst.R2D,
+                          useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=True,
+                          computeDistance=False)
+        else:
+            st = SolTrack(location.geoLongitude, location.geoLatitude, useDegrees=False,
+                          useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
+        
+        # Set date and time to midnight of the desired date:
+        st.setDateTime(time.year, time.month, time.day, 0,0,0.0)
+        
+        # Compute the Sun's position:
+        st.computeSunPosition(st, st)
+        
+        
+        # Compute transit, rise and set times:
+        agst0 = st.agst      # AGST for midnight
+        
+        evMax = 3                  # Compute transit, rise and set times by default (1-3)
+        cosH0 = (np.sin(rsa)-np.sin(st.geoLatitude)*np.sin(st.declination)) / (np.cos(st.geoLatitude)*np.cos(st.declination))
+        
+        if(abs(cosH0) > 1.0):      # Body never rises/sets
+            evMax = 1              # Compute transit time and altitude only
+        else:
+            h0 = np.arccos(cosH0) % self.PI  # Should probably work without %
+            
+        
+        tmRad[0] = (st.rightAscension - st.geoLongitude - st.agst) % self.TWO_PI  # Transit time in radians; lon0 > 0 for E
+        if(evMax > 1):
+            tmRad[1] = (tmRad[0] - h0) % self.TWO_PI   # Rise time in radians
+            tmRad[2] = (tmRad[0] + h0) % self.TWO_PI   # Set time in radians
+            
+            
+        accur = 1.0e-5        # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
+        for evi in range(evMax):  # Loop over transit, rise, set
+            iter = 0
+            dTmRad = np.inf
+            
+            while(abs(dTmRad) > accur):
+                th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
+                
+                st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
+                st.computeSunPosition(st, st)
+                
+                ha  = self.revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
+                alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declination) +
+                                np.cos(st.geoLatitude)*np.cos(st.declination)*np.cos(ha))  # Altitude
+                
+                # Correction to transit/rise/set times:
+                if(evi==0):           # Transit
+                    dTmRad = -self.revPI(ha)  # -PI - +PI
+                else:                 # Rise/set
+                    dTmRad = (alt-rsa)/(np.cos(st.declination)*np.cos(st.geoLatitude)*np.sin(ha))
+                    
+                tmRad[evi] = tmRad[evi] + dTmRad
+                
+                # Print debug output to stdOut:
+                # print(" %4i %2i %2i  %2i %2i %9.3lf    " % (st.year,st.month,st.day, st.hour,st.minute,st.second))
+                # print(" %3i %4i   %9.3lf %9.3lf %9.3lf \n" % (evi,iter, tmRad[evi]*24,abs(dTmRad)*24,accur*24))
+                
+                iter += 1
+                if(iter > 30): break  # while loop doesn't seem to converge
+            # while(abs(dTmRad) > accur)
+            
+            
+            if(iter > 30):  # Convergence failed
+                print("\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n" % (evi,rsAlt))
+                tmRad[evi] = -np.inf
+                azalt[evi] = -np.inf
+            else:               # Result converged, store it
+                if(evi == 0):
+                    azalt[evi] = alt                                                                      # Transit altitude
+                else:
+                    azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(st.geoLatitude)  -
+                                                           np.tan(st.declination) * np.cos(st.geoLatitude) ) )   # Rise,set hour angle -> azimuth
+            
+            
+            if(tmRad[evi] < 0.0 and abs(rsAlt) < 1.e-9):
+                tmRad[evi] = -np.inf
+                azalt[evi] = -np.inf
+                
+        # for-loop evi
+        
+        
+        # Set north to zero radians for azimuth if desired (use the original parameters!):
+        if(self.param.useNorthEqualsZero):
+            azalt[1] = (azalt[1] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
+            azalt[2] = (azalt[2] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
+        
+        
+        # Convert resulting angles to degrees if desired (use the original parameters!):
+        if(self.param.useDegrees):
+            azalt[0] *= self.cst.R2D   # Transit altitude
+            azalt[1] *= self.cst.R2D   # Rise azimuth
+            azalt[2] *= self.cst.R2D   # Set azimuth
+            
+            
+        # Store results:
+        self.transitTime     = tmRad[0]*self.R2H  # Transit time - radians -> hours
+        self.riseTime        = tmRad[1]*self.R2H  # Rise time - radians -> hours
+        self.setTime         = tmRad[2]*self.R2H  # Set time - radians -> hours
+        
+        self.transitAltitude = azalt[0]      # Transit altitude
+        self.riseAzimuth     = azalt[1]      # Rise azimuth
+        self.setAzimuth      = azalt[2]      # Set azimuth
+        
+        return
+    
+    
+    
