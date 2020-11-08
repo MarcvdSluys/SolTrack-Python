@@ -100,12 +100,12 @@ class SolTrack(Location, Time, Position):
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(self.param._computeRefrEquatorial):
-            self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuthRefract,
-                                                self.altitudeRefract)
+            self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuth,
+                                                self.altitude)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(self.param._useNorthEqualsZero):
-            self._setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
+            self._setNorthToZero(self.azimuth, self.hourAngle)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._useDegrees):

@@ -45,15 +45,15 @@ class Position(Constants, Parameters):
         # Equatorial coordinates and sidereal time:
         self.rightAscensionUncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
         self.declinationUncorr:     float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declinationRefract:    float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
+        self.declination:    float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
         
         self._agst:                 float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
-        self.hourAngleRefract:      float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        self.hourAngle:      float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
         
         # Horizontal coordinates:
         self._altitudeUncorr:       float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
-        self.altitudeRefract:       float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
-        self.azimuthRefract:        float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
+        self.altitude:       float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
+        self.azimuth:        float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
         
         
         # Rise, transit and set time:
@@ -189,8 +189,8 @@ class Position(Constants, Parameters):
         
         
         sinAlt=0.0
-        # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
-        self.azimuthRefract, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
+        # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuth' variable directly:
+        self.azimuth, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
                                                      self.rightAscensionUncorr, self.declinationUncorr, self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
@@ -205,7 +205,7 @@ class Position(Constants, Parameters):
         dalt *= self.pressure/101.0 * 283.0/self.temperature
         alt += dalt
         # to do: add pressure/temperature dependence
-        self.altitudeRefract = alt
+        self.altitude = alt
         
         return
     
@@ -265,14 +265,14 @@ class Position(Constants, Parameters):
         cosAlt = np.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
         tanAlt = sinAlt/cosAlt
         
-        self.hourAngleRefract   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
-        self.declinationRefract = np.arcsin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
+        self.hourAngle   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
+        self.declination = np.arcsin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
         
         return
     
     
     
-    def _setNorthToZero(self, azimuthRefract, hourAngleRefract):
+    def _setNorthToZero(self, azimuth, hourAngle):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -285,10 +285,10 @@ class Position(Constants, Parameters):
         
         """
         
-        self.azimuthRefract = (azimuthRefract + self._PI) % self._TWOPI                    # Add PI to set North=0
+        self.azimuth = (azimuth + self._PI) % self._TWOPI                    # Add PI to set North=0
         
         if(self.param._computeRefrEquatorial):
-            self.hourAngleRefract = (hourAngleRefract + self._PI) % self._TWOPI            # Add PI to set North=0
+            self.hourAngle = (hourAngle + self._PI) % self._TWOPI            # Add PI to set North=0
             
         return
     
@@ -306,12 +306,12 @@ class Position(Constants, Parameters):
         self.declinationUncorr *= self._R2D
         
         self._altitudeUncorr *= self._R2D
-        self.azimuthRefract *= self._R2D
-        self.altitudeRefract *= self._R2D
+        self.azimuth *= self._R2D
+        self.altitude *= self._R2D
         
         if(self.param._computeRefrEquatorial):
-            self.hourAngleRefract *= self._R2D
-            self.declinationRefract *= self._R2D
+            self.hourAngle *= self._R2D
+            self.declination *= self._R2D
             
         return
     
