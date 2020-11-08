@@ -58,7 +58,6 @@ class SolTrack(Location, Time, Position):
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
         
         Location.__init__(self, geoLongitude, geoLatitude)
-        # self.setLocation(geoLongitude, geoLatitude)
         
         Time.__init__(self)
         
@@ -72,6 +71,7 @@ class SolTrack(Location, Time, Position):
         """ Method to compute the position of the Sun.
         """
                 
+        # If the user uses degrees, convert the geographic location to radians:
         if(self.param.useDegrees):
             self.geoLongitude /= self.cst.R2D
             self.geoLatitude  /= self.cst.R2D
@@ -111,10 +111,9 @@ class SolTrack(Location, Time, Position):
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param.useDegrees):
-            self._convertRadiansToDegrees()
-            
-            self.geoLongitude *= self.cst.R2D
-            self.geoLatitude  *= self.cst.R2D
+            self.geoLongitude *= self.cst.R2D  # Convert back to original
+            self.geoLatitude  *= self.cst.R2D  # Convert back to original
+            self._convertRadiansToDegrees()    # Convert final results
         
         return
     
@@ -143,7 +142,7 @@ class SolTrack(Location, Time, Position):
         azalt = np.zeros(3)
         alt=0.0;  ha=0.0; h0=0.0
         
-        # Need a local SolTrack instance for the same location (but in radians!), but with different settings
+        # We need a local SolTrack instance for the same location (but in radians!), but with different settings
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
         if(self.param.useDegrees):
@@ -164,7 +163,8 @@ class SolTrack(Location, Time, Position):
         agst0 = st.agst      # AGST for midnight
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
-        cosH0 = (np.sin(rsa)-np.sin(st.geoLatitude)*np.sin(st.declination)) / (np.cos(st.geoLatitude)*np.cos(st.declination))
+        cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st.declination)) / (np.cos(st.geoLatitude) *
+                                                                                   np.cos(st.declination))
         
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
@@ -178,13 +178,13 @@ class SolTrack(Location, Time, Position):
             tmRad[2] = (tmRad[0] + h0) % self.TWO_PI   # Set time in radians
             
             
-        accur = 1.0e-5        # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
+        accur = 1.0e-5            # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
         for evi in range(evMax):  # Loop over transit, rise, set
             iter = 0
             dTmRad = np.inf
             
             while(abs(dTmRad) > accur):
-                th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
+                th0 = agst0 + 1.002737909350795*tmRad[evi]   # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 st.computeSunPosition()
@@ -206,7 +206,7 @@ class SolTrack(Location, Time, Position):
                 # print(" %3i %4i   %9.3lf %9.3lf %9.3lf \n" % (evi,iter, tmRad[evi]*24,abs(dTmRad)*24,accur*24))
                 
                 iter += 1
-                if(iter > 30): break  # while loop doesn't seem to converge
+                if(iter > 30): break  # The while loop doesn't seem to converge
             # while(abs(dTmRad) > accur)
             
             

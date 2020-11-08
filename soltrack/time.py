@@ -24,6 +24,23 @@ class Time:
     
     
     def setDateTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
+        """Set the SolTrack date and time using UTC year, month, day, hour, minute and second.
+        
+           Parameters:
+             year (int):   year of date.
+             month (int):  month of date.
+             day (int):    day of date.
+             
+             hour (int):     hour of day  (default=0).
+             minute (int):   minute of time  (default=0).
+             second (float): second of time  (default=0).
+        
+        """
+        
+        # If a Time object does not yet exist, create it:
+        # if(not hasattr(self, "time")):
+        #     self.time = Time()  # Create a SolTrack Time object
+        
         self.year   = year
         self.month  = month
         self.day    = day
@@ -36,7 +53,7 @@ class Time:
     
     
     def datetime2st(self, dtObj):
-        """Convert a datetime object to a SolTrack time object.
+        """Set the SolTrack date and time using a (local) datetime object.
         
            Args:
                dtObj (datetime):  Date and time in a Python datetime object.

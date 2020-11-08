@@ -70,7 +70,6 @@ class Position(Constants, Parameters):
           - Also computes the obliquity of the ecliptic and nutation.
         
         Parameters:
-          position    (Position):  Class containing the position of the Sun (I/O).
           computeDistance (bool):  Compute distance to the Sun (optional, default=False).
         
         """
@@ -79,33 +78,33 @@ class Position(Constants, Parameters):
         ma = 6.240060141 + 628.301955152 * self.tJC  -  2.682571e-6 * self.tJC2  # Mean anomaly
         
         sec = (3.34161088e-2 - 8.40725e-5* self.tJC - 2.443e-7*self.tJC2)*np.sin(ma) + \
-            (3.489437e-4 - 1.76278e-6*self.tJC)*np.sin(2*ma)                               # Sun's equation of the centre
-        odot = l0 + sec                                                                    # True longitude
+            (3.489437e-4 - 1.76278e-6*self.tJC)*np.sin(2*ma)                            # Sun's equation of the centre
+        odot = l0 + sec                                                                 # True longitude
         
         
         # Nutation, aberration:
-        omg  = 2.1824390725 - 33.7570464271 * self.tJC  + 3.622256e-5 * self.tJC2          # Lon. of Moon's mean ascending node
-        dpsi = -8.338601e-5*np.sin(omg)                                                    # Nutation in longitude
-        dist = 1.0000010178                                                                # Mean distance to the Sun in AU
+        omg  = 2.1824390725 - 33.7570464271 * self.tJC  + 3.622256e-5 * self.tJC2       # Lon. of Moon's mean ascending node
+        dpsi = -8.338601e-5*np.sin(omg)                                                 # Nutation in longitude
+        dist = 1.0000010178                                                             # Mean distance to the Sun in AU
         if(computeDistance):
-            ecc = 0.016708634 - 0.000042037   * self.tJC  -  0.0000001267 * self.tJC2      # Eccentricity of the Earth's orbit
-            nu = ma + sec                                                                  # True anomaly
-            dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                             # Geocentric distance of the Sun in AU
+            ecc = 0.016708634 - 0.000042037   * self.tJC  -  0.0000001267 * self.tJC2   # Eccentricity of the Earth's orbit
+            nu = ma + sec                                                               # True anomaly
+            dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                           # Geocentric distance of the Sun in AU
             
-        aber = -9.93087e-5/dist                                                            # Aberration
+        aber = -9.93087e-5/dist                                                         # Aberration
         
         # Obliquity of the ecliptic and nutation - do this here, since we've already computed many of the ingredients:
-        eps0 = 0.409092804222 - 2.26965525e-4*self.tJC - 2.86e-9*self.tJC2                 # Mean obliquity of the ecliptic
-        deps = 4.4615e-5*np.cos(omg)                                                       # Nutation in obliquity
+        eps0 = 0.409092804222 - 2.26965525e-4*self.tJC - 2.86e-9*self.tJC2              # Mean obliquity of the ecliptic
+        deps = 4.4615e-5*np.cos(omg)                                                    # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % self.TWO_PI                            # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % self.TWO_PI                             # Apparent geocentric longitude, referred to the true equinox of date
         
-        self.distance = dist                                                               # Distance (AU)
+        self.distance = dist                                                            # Distance (AU)
         
-        self.obliquity   = eps0 + deps                                                     # True obliquity of the ecliptic
-        self.cosObliquity = np.cos(self.obliquity)                                         # Need the cosine later on
-        self.nutationLon = dpsi                                                            # Nutation in longitude
+        self.obliquity   = eps0 + deps                                                  # True obliquity of the ecliptic
+        self.cosObliquity = np.cos(self.obliquity)                                      # Need the cosine later on
+        self.nutationLon = dpsi                                                         # Nutation in longitude
         
         return
     
@@ -130,7 +129,7 @@ class Position(Constants, Parameters):
         """
         
         sinLon = np.sin(longitude)
-        sinObl = np.sqrt(1.0-cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
+        sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
         self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self.TWO_PI  # 0 <= azimuth < 2pi
         self.declination      = np.arcsin(sinObl*sinLon)
@@ -207,19 +206,14 @@ class Position(Constants, Parameters):
     
     
     def _convertHorizontalToEquatorial(self, sinLat, cosLat, azimuth, altitude):
-        """Convert (refraction-corrected) horizontal coordinates to equatorial coordinates.
+        """Convert (refraction-corrected) horizontal coordinates to the equatorial coordinates hourAngle and
+        declination.
         
         Parameters:
           sinLat   (float):  Sine of the geographic latitude of the observer.
           cosLat   (float):  Cosine of the geographic latitude of the observer.
           azimuth  (float):  Azimuth ("wind direction") of the Sun (rad; 0=South).
           altitude (float):  Altitude of the Sun above the horizon (rad).
-        
-        Returns: 
-          tuple (float,float):  Tuple containing (hourAngle, declination):
-        
-            - hourAngle   (float):  Hour angle of the Sun (rad; 0=South).
-            - declination (float):  Declination of the Sun (rad).
         
         """
         
@@ -248,12 +242,6 @@ class Position(Constants, Parameters):
         Parameters:
           azimuth              (float):  Azimuth ("wind direction") of the Sun (rad).
           hourAngle            (float):  Hour angle of the Sun (rad).
-        
-        Returns: 
-          tuple (float,float):  Tuple containing (azimuth, hourAngle):
-        
-            - azimuth   (float):  Azimuth ("wind direction") of the Sun (rad).
-            - hourAngle (float):  Hour angle of the Sun (rad; 0=South).
         
         """
         
@@ -292,7 +280,10 @@ class Position(Constants, Parameters):
         """Fold an angle in radians to take a value between -PI and +PI.
         
         Parameters:
-          angle (float):  Angle to fold (rad).
+          angle (float):  Angle to fold (radians).
+        
+        Returns:
+          float: Angle between -PI and PI (radians).
         
         """
         

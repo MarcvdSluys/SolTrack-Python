@@ -42,8 +42,8 @@ class Location:
         self.geoLongitude = geoLongitude
         self.geoLatitude  = geoLatitude
         
-        self.pressure    = pressure
-        self.temperature = temperature
+        self.pressure     = pressure
+        self.temperature  = temperature
         
         return
 
