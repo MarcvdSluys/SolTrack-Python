@@ -55,7 +55,7 @@ class SolTrack(Location, Time, Position):
         self.cst       = Constants()
         
         self.param     = Parameters()
-        self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
+        self.param.setParameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
         
         Location.__init__(self, geoLongitude, geoLatitude)
         
@@ -72,45 +72,45 @@ class SolTrack(Location, Time, Position):
         """
                 
         # If the user uses degrees, convert the geographic location to radians:
-        if(self.param.useDegrees):
+        if(self.param._useDegrees):
             self.geoLongitude /= self.cst.R2D
             self.geoLatitude  /= self.cst.R2D
         
         # Compute these once and reuse:
-        self.sinLat = np.sin(self.geoLatitude)
-        self.cosLat = np.sqrt(1.0 - self.sinLat**2)  # Cosine of a latitude is always positive or zero
+        self._sinLat = np.sin(self.geoLatitude)
+        self._cosLat = np.sqrt(1.0 - self._sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
         # Compute the Julian Day from the date and time:
         self._computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # Derived expressions for time, to be reused:
-        self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
-        self.tJC  = self.tJD/36525.0                             # Time in Julian centuries since 2000.0
-        self.tJC2 = self.tJC**2                                  # T^2
+        self._tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
+        self._tJC  = self._tJD/36525.0                             # Time in Julian centuries since 2000.0
+        self._tJC2 = self._tJC**2                                  # T^2
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
-        self._computeLongitude(self.param.computeDistance)
+        self._computeLongitude(self.param._computeDistance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self._convertEclipticToEquatorial(self.longitude, self.cosObliquity)
+        self._convertEclipticToEquatorial(self.longitude, self._cosObliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
         self._convertEquatorialToHorizontal()
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
-        if(self.param.computeRefrEquatorial):
-            self._convertHorizontalToEquatorial(self.sinLat, self.cosLat, self.azimuthRefract,
+        if(self.param._computeRefrEquatorial):
+            self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuthRefract,
                                                 self.altitudeRefract)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
-        if(self.param.useNorthEqualsZero):
+        if(self.param._useNorthEqualsZero):
             self._setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
             
         # If the user wants degrees, convert final results from radians to degrees:
-        if(self.param.useDegrees):
+        if(self.param._useDegrees):
             self.geoLongitude *= self.cst.R2D  # Convert back to original
             self.geoLatitude  *= self.cst.R2D  # Convert back to original
             self._convertRadiansToDegrees()    # Convert final results
@@ -145,7 +145,7 @@ class SolTrack(Location, Time, Position):
         # We need a local SolTrack instance for the same location (but in radians!), but with different settings
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
-        if(self.param.useDegrees):
+        if(self.param._useDegrees):
             st = SolTrack(self.geoLongitude/self.cst.R2D, self.geoLatitude/self.cst.R2D, useDegrees=False,
                           useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
         else:
@@ -160,7 +160,7 @@ class SolTrack(Location, Time, Position):
         
         
         # Compute transit, rise and set times:
-        agst0 = st.agst      # AGST for midnight
+        agst0 = st._agst      # AGST for midnight
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
         cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st.declination)) / (np.cos(st.geoLatitude) *
@@ -172,7 +172,7 @@ class SolTrack(Location, Time, Position):
             h0 = np.arccos(cosH0) % self.PI  # Should probably work without %
             
         
-        tmRad[0] = (st.rightAscension - st.geoLongitude - st.agst) % self.TWO_PI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (st.rightAscension - st.geoLongitude - st._agst) % self.TWO_PI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
             tmRad[1] = (tmRad[0] - h0) % self.TWO_PI   # Rise time in radians
             tmRad[2] = (tmRad[0] + h0) % self.TWO_PI   # Set time in radians
@@ -230,13 +230,13 @@ class SolTrack(Location, Time, Position):
         
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
-        if(self.param.useNorthEqualsZero):
+        if(self.param._useNorthEqualsZero):
             azalt[1] = (azalt[1] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
             azalt[2] = (azalt[2] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
         
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
-        if(self.param.useDegrees):
+        if(self.param._useDegrees):
             azalt[0] *= self.cst.R2D   # Transit altitude
             azalt[1] *= self.cst.R2D   # Rise azimuth
             azalt[2] *= self.cst.R2D   # Set azimuth

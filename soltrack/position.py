@@ -74,27 +74,27 @@ class Position(Constants, Parameters):
         
         """
         
-        l0 = 4.895063168 + 628.331966786 * self.tJC  +  5.291838e-6 * self.tJC2  # Mean longitude
-        ma = 6.240060141 + 628.301955152 * self.tJC  -  2.682571e-6 * self.tJC2  # Mean anomaly
+        l0 = 4.895063168 + 628.331966786 * self._tJC  +  5.291838e-6 * self._tJC2  # Mean longitude
+        ma = 6.240060141 + 628.301955152 * self._tJC  -  2.682571e-6 * self._tJC2  # Mean anomaly
         
-        sec = (3.34161088e-2 - 8.40725e-5* self.tJC - 2.443e-7*self.tJC2)*np.sin(ma) + \
-            (3.489437e-4 - 1.76278e-6*self.tJC)*np.sin(2*ma)                            # Sun's equation of the centre
+        sec = (3.34161088e-2 - 8.40725e-5* self._tJC - 2.443e-7*self._tJC2)*np.sin(ma) + \
+            (3.489437e-4 - 1.76278e-6*self._tJC)*np.sin(2*ma)                            # Sun's equation of the centre
         odot = l0 + sec                                                                 # True longitude
         
         
         # Nutation, aberration:
-        omg  = 2.1824390725 - 33.7570464271 * self.tJC  + 3.622256e-5 * self.tJC2       # Lon. of Moon's mean ascending node
+        omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2       # Lon. of Moon's mean ascending node
         dpsi = -8.338601e-5*np.sin(omg)                                                 # Nutation in longitude
         dist = 1.0000010178                                                             # Mean distance to the Sun in AU
         if(computeDistance):
-            ecc = 0.016708634 - 0.000042037   * self.tJC  -  0.0000001267 * self.tJC2   # Eccentricity of the Earth's orbit
+            ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2   # Eccentricity of the Earth's orbit
             nu = ma + sec                                                               # True anomaly
             dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                           # Geocentric distance of the Sun in AU
             
         aber = -9.93087e-5/dist                                                         # Aberration
         
         # Obliquity of the ecliptic and nutation - do this here, since we've already computed many of the ingredients:
-        eps0 = 0.409092804222 - 2.26965525e-4*self.tJC - 2.86e-9*self.tJC2              # Mean obliquity of the ecliptic
+        eps0 = 0.409092804222 - 2.26965525e-4*self._tJC - 2.86e-9*self._tJC2              # Mean obliquity of the ecliptic
         deps = 4.4615e-5*np.cos(omg)                                                    # Nutation in obliquity
         
         # Save position parameters:
@@ -102,9 +102,9 @@ class Position(Constants, Parameters):
         
         self.distance = dist                                                            # Distance (AU)
         
-        self.obliquity   = eps0 + deps                                                  # True obliquity of the ecliptic
-        self.cosObliquity = np.cos(self.obliquity)                                      # Need the cosine later on
-        self.nutationLon = dpsi                                                         # Nutation in longitude
+        self._obliquity   = eps0 + deps                                                  # True obliquity of the ecliptic
+        self._cosObliquity = np.cos(self._obliquity)                                     # Need the cosine later on
+        self._nutationLon = dpsi                                                         # Nutation in longitude
         
         return
     
@@ -144,21 +144,21 @@ class Position(Constants, Parameters):
         
         """
         
-        gmst      = 4.89496121 + 6.300388098985*self.tJD + 6.77e-6*self.tJC2  # Greenwich mean sidereal time
-        self.agst = gmst + self.nutationLon * self.cosObliquity               # Correction for equation of the equinoxes . apparent Greenwich sidereal time
+        gmst       = 4.89496121 + 6.300388098985*self._tJD + 6.77e-6*self._tJC2  # Greenwich mean sidereal time
+        self._agst = gmst + self._nutationLon * self._cosObliquity              # Correction for equation of the equinoxes . apparent Greenwich sidereal time
         
         
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
-        self.azimuthRefract, sinAlt = self._eq2horiz(self.sinLat,self.cosLat, self.geoLongitude,
-                                                     self.rightAscension, self.declination, self.agst)
+        self.azimuthRefract, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
+                                                     self.rightAscension, self.declination, self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
-        self.altitude = alt
+        self._altitude = alt
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
@@ -247,7 +247,7 @@ class Position(Constants, Parameters):
         
         self.azimuthRefract = (azimuthRefract + self.PI) % self.TWO_PI                    # Add PI to set North=0
         
-        if(self.param.computeRefrEquatorial):
+        if(self.param._computeRefrEquatorial):
             self.hourAngleRefract = (hourAngleRefract + self.PI) % self.TWO_PI            # Add PI to set North=0
             
         return
@@ -265,11 +265,11 @@ class Position(Constants, Parameters):
         self.rightAscension *= self.R2D
         self.declination *= self.R2D
         
-        self.altitude *= self.R2D
+        self._altitude *= self.R2D
         self.azimuthRefract *= self.R2D
         self.altitudeRefract *= self.R2D
         
-        if(self.param.computeRefrEquatorial):
+        if(self.param._computeRefrEquatorial):
             self.hourAngleRefract *= self.R2D
             self.declinationRefract *= self.R2D
             

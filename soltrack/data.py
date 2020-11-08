@@ -31,10 +31,10 @@ class Constants:
 class Parameters:
     """Class containing SolTrack parameters/settings."""
     
-    useDegrees: bool             = False;   """Input (geographic position) and output are in degrees"""
-    useNorthEqualsZero: bool     = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East"""
-    computeRefrEquatorial: bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)"""
-    computeDistance: bool        = False;   """Compute the distance to the Sun"""
+    _useDegrees: bool             = False;   """Input (geographic position) and output are in degrees"""
+    _useNorthEqualsZero: bool     = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East"""
+    _computeRefrEquatorial: bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)"""
+    _computeDistance: bool        = False;   """Compute the distance to the Sun"""
     
     
     def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
@@ -48,9 +48,9 @@ class Parameters:
           computeDistance (bool):         Compute the distance to the Sun.
         """
         
-        if(useDegrees):             self.useDegrees             = useDegrees
-        if(useNorthEqualsZero):     self.useNorthEqualsZero     = useNorthEqualsZero
-        if(computeRefrEquatorial):  self.computeRefrEquatorial  = computeRefrEquatorial
-        if(computeDistance):        self.computeDistance        = computeDistance
+        if(useDegrees):             self._useDegrees             = useDegrees
+        if(useNorthEqualsZero):     self._useNorthEqualsZero     = useNorthEqualsZero
+        if(computeRefrEquatorial):  self._computeRefrEquatorial  = computeRefrEquatorial
+        if(computeDistance):        self._computeDistance        = computeDistance
         
         return
