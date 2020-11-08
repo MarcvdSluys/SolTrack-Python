@@ -27,10 +27,10 @@ name = "soltrack"
 from dataclasses import dataclass
 import numpy as np
 
-from .data import Constants, Parameters
-from .location import Location
-from .time import Time
-from .position import Position
+from .data      import Constants, Parameters
+from .location  import Location
+from .time      import Time
+from .position  import Position
 
 
 @dataclass
@@ -57,8 +57,8 @@ class SolTrack(Location, Time, Position):
         self.param     = Parameters()
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
         
-        Location.__init__(self)
-        self.setLocation(geoLongitude, geoLatitude)
+        Location.__init__(self, geoLongitude, geoLatitude)
+        # self.setLocation(geoLongitude, geoLatitude)
         
         Time.__init__(self)
         

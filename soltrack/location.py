@@ -28,8 +28,25 @@ from dataclasses import dataclass
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
     
+    geoLongitude: float = 0.0;      """Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees)."""
+    geoLatitude:  float = 0.0;      """Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees)."""
+    
+    pressure:     float = 101.0;    """Air pressure at the site (kPa)."""
+    temperature:  float = 283.0;    """Air temperature at the site (K)."""
+    
     
     def setLocation(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
+        """Setter for the details of the observer/site location to compute the Sun position for.
+        
+        Parameters:
+          geoLongitude (float):  Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees).
+          geoLatitude  (float):  Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees).
+          
+          pressure     (float):  Air pressure at the site (kPa).
+          temperature  (float):  Air temperature at the site (K).
+        
+        """
+        
         self.geoLongitude = geoLongitude
         self.geoLatitude  = geoLatitude
         
