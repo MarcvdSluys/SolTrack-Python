@@ -20,10 +20,10 @@ from dataclasses import dataclass
 class Constants:
     """Class containing SolTrack constants."""
     
-    PI: float         = 3.14159265358979323846;   """Pi"""
+    PI:     float     = 3.14159265358979323846;   """Pi"""
     TWO_PI: float     = 6.28318530717958647693;   """2 pi"""
-    R2D: float        = 57.2957795130823208768;   """Radians to degrees conversion factor"""
-    R2H: float        = 3.81971863420548805845;   """Radians to hours conversion factor"""
+    R2D:    float     = 57.2957795130823208768;   """Radians to degrees conversion factor"""
+    R2H:    float     = 3.81971863420548805845;   """Radians to hours conversion factor"""
 
 
 
@@ -31,10 +31,10 @@ class Constants:
 class Parameters:
     """Class containing SolTrack parameters/settings."""
     
-    _useDegrees: bool             = False;   """Input (geographic position) and output are in degrees"""
-    _useNorthEqualsZero: bool     = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East"""
-    _computeRefrEquatorial: bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)"""
-    _computeDistance: bool        = False;   """Compute the distance to the Sun"""
+    _useDegrees:             bool  = False;   """Input (geographic position) and output are in degrees."""
+    _useNorthEqualsZero:     bool  = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East."""
+    _computeRefrEquatorial:  bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)."""
+    _computeDistance:        bool  = False;   """Compute the distance to the Sun."""
     
     
     def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,

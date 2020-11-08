@@ -27,7 +27,7 @@ name = "soltrack"
 from dataclasses import dataclass
 import numpy as np
 
-from .data      import Constants, Parameters
+from .data      import Parameters
 from .location  import Location
 from .time      import Time
 from .position  import Position
@@ -52,8 +52,6 @@ class SolTrack(Location, Time, Position):
         
         """
         
-        self.cst       = Constants()
-        
         self.param     = Parameters()
         self.param.setParameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
         
@@ -73,8 +71,8 @@ class SolTrack(Location, Time, Position):
                 
         # If the user uses degrees, convert the geographic location to radians:
         if(self.param._useDegrees):
-            self.geoLongitude /= self.cst.R2D
-            self.geoLatitude  /= self.cst.R2D
+            self.geoLongitude /= self.R2D
+            self.geoLatitude  /= self.R2D
         
         # Compute these once and reuse:
         self._sinLat = np.sin(self.geoLatitude)
@@ -111,8 +109,8 @@ class SolTrack(Location, Time, Position):
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._useDegrees):
-            self.geoLongitude *= self.cst.R2D  # Convert back to original
-            self.geoLatitude  *= self.cst.R2D  # Convert back to original
+            self.geoLongitude *= self.R2D  # Convert back to original
+            self.geoLatitude  *= self.R2D  # Convert back to original
             self._convertRadiansToDegrees()    # Convert final results
         
         return
@@ -135,7 +133,7 @@ class SolTrack(Location, Time, Position):
         
         """
         
-        rsa = -0.8333/self.cst.R2D              # Standard altitude for the Sun in radians
+        rsa = -0.8333/self.R2D              # Standard altitude for the Sun in radians
         if(abs(rsAlt) > 1.e-9): rsa = rsAlt     # Use a user-specified altitude
         
         tmRad = np.zeros(3)
@@ -146,7 +144,7 @@ class SolTrack(Location, Time, Position):
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
         if(self.param._useDegrees):
-            st = SolTrack(self.geoLongitude/self.cst.R2D, self.geoLatitude/self.cst.R2D, useDegrees=False,
+            st = SolTrack(self.geoLongitude/self.R2D, self.geoLatitude/self.R2D, useDegrees=False,
                           useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
         else:
             st = SolTrack(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
@@ -237,9 +235,9 @@ class SolTrack(Location, Time, Position):
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
         if(self.param._useDegrees):
-            azalt[0] *= self.cst.R2D   # Transit altitude
-            azalt[1] *= self.cst.R2D   # Rise azimuth
-            azalt[2] *= self.cst.R2D   # Set azimuth
+            azalt[0] *= self.R2D   # Transit altitude
+            azalt[1] *= self.R2D   # Rise azimuth
+            azalt[2] *= self.R2D   # Set azimuth
             
             
         # Store results:

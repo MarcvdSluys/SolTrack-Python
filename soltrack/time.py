@@ -27,13 +27,13 @@ class Time:
         """Set the SolTrack date and time using UTC year, month, day, hour, minute and second.
         
            Parameters:
-             year (int):   year of date.
-             month (int):  month of date.
-             day (int):    day of date.
+             year   (int):    year of date.
+             month  (int):    month of date.
+             day    (int):    day of date.
              
-             hour (int):     hour of day  (default=0).
-             minute (int):   minute of time  (default=0).
-             second (float): second of time  (default=0).
+             hour   (int):    hour of day  (default=0).
+             minute (int):    minute of time  (default=0).
+             second (float):  second of time  (default=0).
         
         """
         
