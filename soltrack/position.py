@@ -43,8 +43,8 @@ class Position(Constants, Parameters):
         self._nutationLon:          float = 0.0;      """Nutation in longitude (radians)"""
         
         # Equatorial coordinates and sidereal time:
-        self.rightAscensionUncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declinationUncorr:     float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
+        self._rightAscensionUncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
+        self._declinationUncorr:     float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
         self.declination:    float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
         
         self._agst:                 float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
@@ -171,8 +171,8 @@ class Position(Constants, Parameters):
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscensionUncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
-        self.declinationUncorr     = np.arcsin(sinObl*sinLon)
+        self._rightAscensionUncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
+        self._declinationUncorr     = np.arcsin(sinObl*sinLon)
         
         return
     
@@ -191,7 +191,7 @@ class Position(Constants, Parameters):
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuth' variable directly:
         self.azimuth, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
-                                                     self.rightAscensionUncorr, self.declinationUncorr, self._agst)
+                                                     self._rightAscensionUncorr, self._declinationUncorr, self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
@@ -302,8 +302,8 @@ class Position(Constants, Parameters):
         """
         
         self.longitude *= self._R2D
-        self.rightAscensionUncorr *= self._R2D
-        self.declinationUncorr *= self._R2D
+        self._rightAscensionUncorr *= self._R2D
+        self._declinationUncorr *= self._R2D
         
         self._altitudeUncorr *= self._R2D
         self.azimuth *= self._R2D

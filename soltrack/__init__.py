@@ -161,8 +161,8 @@ class SolTrack(Location, Time, Position):
         agst0 = st._agst      # AGST for midnight
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
-        cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st.declinationUncorr)) / (np.cos(st.geoLatitude) *
-                                                                                         np.cos(st.declinationUncorr))
+        cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st._declinationUncorr)) / (np.cos(st.geoLatitude) *
+                                                                                         np.cos(st._declinationUncorr))
         
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
@@ -170,7 +170,7 @@ class SolTrack(Location, Time, Position):
             h0 = np.arccos(cosH0) % self._PI  # Should probably work without %
             
         
-        tmRad[0] = (st.rightAscensionUncorr - st.geoLongitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (st._rightAscensionUncorr - st.geoLongitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
             tmRad[1] = (tmRad[0] - h0) % self._TWOPI   # Rise time in radians
             tmRad[2] = (tmRad[0] + h0) % self._TWOPI   # Set time in radians
@@ -187,15 +187,15 @@ class SolTrack(Location, Time, Position):
                 st.second = tmRad[evi]*self._R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 st.computePosition()
                 
-                ha  = self._revPI(th0 + st.geoLongitude - st.rightAscensionUncorr)        # Hour angle: -PI - +PI
-                alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declinationUncorr) +
-                                np.cos(st.geoLatitude)*np.cos(st.declinationUncorr)*np.cos(ha))  # Altitude
+                ha  = self._revPI(th0 + st.geoLongitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI
+                alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st._declinationUncorr) +
+                                np.cos(st.geoLatitude)*np.cos(st._declinationUncorr)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
                     dTmRad = -self._revPI(ha)  # -PI - +PI
                 else:                 # Rise/set
-                    dTmRad = (alt-rsa)/(np.cos(st.declinationUncorr)*np.cos(st.geoLatitude)*np.sin(ha))
+                    dTmRad = (alt-rsa)/(np.cos(st._declinationUncorr)*np.cos(st.geoLatitude)*np.sin(ha))
                     
                 tmRad[evi] = tmRad[evi] + dTmRad
                 
@@ -217,7 +217,7 @@ class SolTrack(Location, Time, Position):
                     azalt[evi] = alt                                                                      # Transit altitude
                 else:
                     azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(st.geoLatitude)  -
-                                                           np.tan(st.declinationUncorr) * np.cos(st.geoLatitude) ) )   # Rise,set hour angle -> azimuth
+                                                           np.tan(st._declinationUncorr) * np.cos(st.geoLatitude) ) )   # Rise,set hour angle -> azimuth
             
             
             if(tmRad[evi] < 0.0 and abs(rsAlt) < 1.e-9):
