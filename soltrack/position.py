@@ -98,7 +98,7 @@ class Position(Constants, Parameters):
         deps = 4.4615e-5*np.cos(omg)                                                    # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % self.TWO_PI                             # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % self._TWOPI                             # Apparent geocentric longitude, referred to the true equinox of date
         
         self.distance = dist                                                            # Distance (AU)
         
@@ -131,7 +131,7 @@ class Position(Constants, Parameters):
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self.TWO_PI  # 0 <= azimuth < 2pi
+        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
         self.declination      = np.arcsin(sinObl*sinLon)
         
         return
@@ -245,10 +245,10 @@ class Position(Constants, Parameters):
         
         """
         
-        self.azimuthRefract = (azimuthRefract + self.PI) % self.TWO_PI                    # Add PI to set North=0
+        self.azimuthRefract = (azimuthRefract + self._PI) % self._TWOPI                    # Add PI to set North=0
         
         if(self.param._computeRefrEquatorial):
-            self.hourAngleRefract = (hourAngleRefract + self.PI) % self.TWO_PI            # Add PI to set North=0
+            self.hourAngleRefract = (hourAngleRefract + self._PI) % self._TWOPI            # Add PI to set North=0
             
         return
     
@@ -261,17 +261,17 @@ class Position(Constants, Parameters):
         
         """
         
-        self.longitude *= self.R2D
-        self.rightAscension *= self.R2D
-        self.declination *= self.R2D
+        self.longitude *= self._R2D
+        self.rightAscension *= self._R2D
+        self.declination *= self._R2D
         
-        self._altitude *= self.R2D
-        self.azimuthRefract *= self.R2D
-        self.altitudeRefract *= self.R2D
+        self._altitude *= self._R2D
+        self.azimuthRefract *= self._R2D
+        self.altitudeRefract *= self._R2D
         
         if(self.param._computeRefrEquatorial):
-            self.hourAngleRefract *= self.R2D
-            self.declinationRefract *= self.R2D
+            self.hourAngleRefract *= self._R2D
+            self.declinationRefract *= self._R2D
             
         return
     
@@ -287,6 +287,6 @@ class Position(Constants, Parameters):
         
         """
         
-        return ((angle + self.PI) % self.TWO_PI) - self.PI
+        return ((angle + self._PI) % self._TWOPI) - self._PI
     
 

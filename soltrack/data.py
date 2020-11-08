@@ -20,10 +20,10 @@ from dataclasses import dataclass
 class Constants:
     """Class containing SolTrack constants."""
     
-    PI:     float     = 3.14159265358979323846;   """Pi"""
-    TWO_PI: float     = 6.28318530717958647693;   """2 pi"""
-    R2D:    float     = 57.2957795130823208768;   """Radians to degrees conversion factor"""
-    R2H:    float     = 3.81971863420548805845;   """Radians to hours conversion factor"""
+    _PI:     float     = 3.14159265358979323846;   """Pi"""
+    _TWOPI: float     = 6.28318530717958647693;   """2 pi"""
+    _R2D:    float     = 57.2957795130823208768;   """Radians to degrees conversion factor"""
+    _R2H:    float     = 3.81971863420548805845;   """Radians to hours conversion factor"""
 
 
 

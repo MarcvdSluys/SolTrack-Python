@@ -71,8 +71,8 @@ class SolTrack(Location, Time, Position):
                 
         # If the user uses degrees, convert the geographic location to radians:
         if(self.param._useDegrees):
-            self.geoLongitude /= self.R2D
-            self.geoLatitude  /= self.R2D
+            self.geoLongitude /= self._R2D
+            self.geoLatitude  /= self._R2D
         
         # Compute these once and reuse:
         self._sinLat = np.sin(self.geoLatitude)
@@ -109,8 +109,8 @@ class SolTrack(Location, Time, Position):
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._useDegrees):
-            self.geoLongitude *= self.R2D  # Convert back to original
-            self.geoLatitude  *= self.R2D  # Convert back to original
+            self.geoLongitude *= self._R2D  # Convert back to original
+            self.geoLatitude  *= self._R2D  # Convert back to original
             self._convertRadiansToDegrees()    # Convert final results
         
         return
@@ -133,7 +133,7 @@ class SolTrack(Location, Time, Position):
         
         """
         
-        rsa = -0.8333/self.R2D              # Standard altitude for the Sun in radians
+        rsa = -0.8333/self._R2D              # Standard altitude for the Sun in radians
         if(abs(rsAlt) > 1.e-9): rsa = rsAlt     # Use a user-specified altitude
         
         tmRad = np.zeros(3)
@@ -144,7 +144,7 @@ class SolTrack(Location, Time, Position):
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
         if(self.param._useDegrees):
-            st = SolTrack(self.geoLongitude/self.R2D, self.geoLatitude/self.R2D, useDegrees=False,
+            st = SolTrack(self.geoLongitude/self._R2D, self.geoLatitude/self._R2D, useDegrees=False,
                           useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
         else:
             st = SolTrack(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
@@ -167,13 +167,13 @@ class SolTrack(Location, Time, Position):
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
         else:
-            h0 = np.arccos(cosH0) % self.PI  # Should probably work without %
+            h0 = np.arccos(cosH0) % self._PI  # Should probably work without %
             
         
-        tmRad[0] = (st.rightAscension - st.geoLongitude - st._agst) % self.TWO_PI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (st.rightAscension - st.geoLongitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
-            tmRad[1] = (tmRad[0] - h0) % self.TWO_PI   # Rise time in radians
-            tmRad[2] = (tmRad[0] + h0) % self.TWO_PI   # Set time in radians
+            tmRad[1] = (tmRad[0] - h0) % self._TWOPI   # Rise time in radians
+            tmRad[2] = (tmRad[0] + h0) % self._TWOPI   # Set time in radians
             
             
         accur = 1.0e-5            # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
@@ -184,7 +184,7 @@ class SolTrack(Location, Time, Position):
             while(abs(dTmRad) > accur):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]   # Solar day in sidereal days in 2000
                 
-                st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
+                st.second = tmRad[evi]*self._R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 st.computePosition()
                 
                 ha  = self._revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
@@ -229,21 +229,21 @@ class SolTrack(Location, Time, Position):
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
         if(self.param._useNorthEqualsZero):
-            azalt[1] = (azalt[1] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
-            azalt[2] = (azalt[2] + self.PI) % self.TWO_PI  # Add PI and fold between 0 and 2pi
+            azalt[1] = (azalt[1] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
+            azalt[2] = (azalt[2] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
         
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
         if(self.param._useDegrees):
-            azalt[0] *= self.R2D   # Transit altitude
-            azalt[1] *= self.R2D   # Rise azimuth
-            azalt[2] *= self.R2D   # Set azimuth
+            azalt[0] *= self._R2D   # Transit altitude
+            azalt[1] *= self._R2D   # Rise azimuth
+            azalt[2] *= self._R2D   # Set azimuth
             
             
         # Store results:
-        self.transitTime     = tmRad[0]*self.R2H  # Transit time - radians -> hours
-        self.riseTime        = tmRad[1]*self.R2H  # Rise time - radians -> hours
-        self.setTime         = tmRad[2]*self.R2H  # Set time - radians -> hours
+        self.transitTime     = tmRad[0]*self._R2H  # Transit time - radians -> hours
+        self.riseTime        = tmRad[1]*self._R2H  # Rise time - radians -> hours
+        self.setTime         = tmRad[2]*self._R2H  # Set time - radians -> hours
         
         self.transitAltitude = azalt[0]      # Transit altitude
         self.riseAzimuth     = azalt[1]      # Rise azimuth
