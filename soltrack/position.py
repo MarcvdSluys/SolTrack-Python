@@ -27,6 +27,46 @@ class Position(Constants, Parameters):
     def __init__(self):
         Parameters.__init__(self)
         
+        # Time:
+        self.julianDay:           float = 0.0;      """The Julian day for the desired instant"""
+        self._tJD:                float = 0.0;      """Time in Julian days since 2000.0"""
+        self._tJC:                float = 0.0;      """Time in Julian centuries since 2000.0"""
+        self._tJC2:               float = 0.0;      """Time in Julian centuries since 2000.0 squared"""
+        
+        # Ecliptical coordinates:
+        self.longitude:           float = 0.0;      """Ecliptical longitude of the Sun (radians)"""
+        self.distance:            float = 0.0;      """Distance Earth-Sun (AU)"""
+        
+        # Obliquity of the ecliptic and nutation:
+        self._obliquity:          float = 0.0;      """Obliquity of the ecliptic (radians)"""
+        self._cosObliquity:       float = 0.0;      """Cosine of the obliquity of the ecliptic"""
+        self._nutationLon:        float = 0.0;      """Nutation in longitude (radians)"""
+        
+        # Equatorial coordinates and sidereal time:
+        self.rightAscension:      float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
+        self.declination:         float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
+        self.declinationRefract:  float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
+        
+        self._agst:               float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
+        self.hourAngleRefract:    float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        
+        # Horizontal coordinates:
+        self._altitude:           float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
+        self.altitudeRefract:     float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
+        self.azimuthRefract:      float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
+        
+        
+        # Rise, transit and set time:
+        self.riseTime:            float = 0.0;      """Rise time of the Sun (hours UT)"""
+        self.transitTime:         float = 0.0;      """Transit time of the Sun (hours UT)"""
+        self.setTime:             float = 0.0;      """Set time of the Sun (hours UT)"""
+        
+        # Rise, transit and set position:
+        self.riseAzimuth:         float = 0.0;      """Rise azimuth of the Sun (radians)"""
+        self.transitAltitude:     float = 0.0;      """Transit altitude of the Sun (radians)"""
+        self.setAzimuth:          float = 0.0;      """Set azimuth of the Sun (radians)"""
+        
+        
     
     
     def _computeJulianDay(self, year, month, day,  hour, minute, second):
@@ -74,33 +114,33 @@ class Position(Constants, Parameters):
         
         """
         
-        l0 = 4.895063168 + 628.331966786 * self._tJC  +  5.291838e-6 * self._tJC2  # Mean longitude
-        ma = 6.240060141 + 628.301955152 * self._tJC  -  2.682571e-6 * self._tJC2  # Mean anomaly
+        l0 = 4.895063168 + 628.331966786 * self._tJC  +  5.291838e-6 * self._tJC2        # Mean longitude
+        ma = 6.240060141 + 628.301955152 * self._tJC  -  2.682571e-6 * self._tJC2        # Mean anomaly
         
         sec = (3.34161088e-2 - 8.40725e-5* self._tJC - 2.443e-7*self._tJC2)*np.sin(ma) + \
             (3.489437e-4 - 1.76278e-6*self._tJC)*np.sin(2*ma)                            # Sun's equation of the centre
-        odot = l0 + sec                                                                 # True longitude
+        odot = l0 + sec                                                                  # True longitude
         
         
         # Nutation, aberration:
-        omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2       # Lon. of Moon's mean ascending node
-        dpsi = -8.338601e-5*np.sin(omg)                                                 # Nutation in longitude
-        dist = 1.0000010178                                                             # Mean distance to the Sun in AU
+        omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2      # Lon. of Moon's mean ascending node
+        dpsi = -8.338601e-5*np.sin(omg)                                                  # Nutation in longitude
+        dist = 1.0000010178                                                              # Mean distance to the Sun in AU
         if(computeDistance):
-            ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2   # Eccentricity of the Earth's orbit
-            nu = ma + sec                                                               # True anomaly
-            dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                           # Geocentric distance of the Sun in AU
+            ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2  # Eccentricity of the Earth's orbit
+            nu = ma + sec                                                                # True anomaly
+            dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                            # Geocentric distance of the Sun in AU
             
-        aber = -9.93087e-5/dist                                                         # Aberration
+        aber = -9.93087e-5/dist                                                          # Aberration
         
         # Obliquity of the ecliptic and nutation - do this here, since we've already computed many of the ingredients:
-        eps0 = 0.409092804222 - 2.26965525e-4*self._tJC - 2.86e-9*self._tJC2              # Mean obliquity of the ecliptic
-        deps = 4.4615e-5*np.cos(omg)                                                    # Nutation in obliquity
+        eps0 = 0.409092804222 - 2.26965525e-4*self._tJC - 2.86e-9*self._tJC2             # Mean obliquity of the ecliptic
+        deps = 4.4615e-5*np.cos(omg)                                                     # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % self._TWOPI                             # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % self._TWOPI                              # Apparent geocentric longitude, referred to the true equinox of date
         
-        self.distance = dist                                                            # Distance (AU)
+        self.distance = dist                                                             # Distance (AU)
         
         self._obliquity   = eps0 + deps                                                  # True obliquity of the ecliptic
         self._cosObliquity = np.cos(self._obliquity)                                     # Need the cosine later on
