@@ -28,43 +28,43 @@ class Position(Constants, Parameters):
         Parameters.__init__(self)
         
         # Time:
-        self.julianDay:           float = 0.0;      """The Julian day for the desired instant"""
-        self._tJD:                float = 0.0;      """Time in Julian days since 2000.0"""
-        self._tJC:                float = 0.0;      """Time in Julian centuries since 2000.0"""
-        self._tJC2:               float = 0.0;      """Time in Julian centuries since 2000.0 squared"""
+        self.julianDay:             float = 0.0;      """The Julian day for the desired instant"""
+        self._tJD:                  float = 0.0;      """Time in Julian days since 2000.0"""
+        self._tJC:                  float = 0.0;      """Time in Julian centuries since 2000.0"""
+        self._tJC2:                 float = 0.0;      """Time in Julian centuries since 2000.0 squared"""
         
         # Ecliptical coordinates:
-        self.longitude:           float = 0.0;      """Ecliptical longitude of the Sun (radians)"""
-        self.distance:            float = 0.0;      """Distance Earth-Sun (AU)"""
+        self.longitude:             float = 0.0;      """Ecliptical longitude of the Sun (radians)"""
+        self.distance:              float = 0.0;      """Distance Earth-Sun (AU)"""
         
         # Obliquity of the ecliptic and nutation:
-        self._obliquity:          float = 0.0;      """Obliquity of the ecliptic (radians)"""
-        self._cosObliquity:       float = 0.0;      """Cosine of the obliquity of the ecliptic"""
-        self._nutationLon:        float = 0.0;      """Nutation in longitude (radians)"""
+        self._obliquity:            float = 0.0;      """Obliquity of the ecliptic (radians)"""
+        self._cosObliquity:         float = 0.0;      """Cosine of the obliquity of the ecliptic"""
+        self._nutationLon:          float = 0.0;      """Nutation in longitude (radians)"""
         
         # Equatorial coordinates and sidereal time:
-        self.rightAscension:      float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declination:         float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declinationRefract:  float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
+        self.rightAscensionUncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
+        self.declinationUncorr:     float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
+        self.declinationRefract:    float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
         
-        self._agst:               float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
-        self.hourAngleRefract:    float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        self._agst:                 float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
+        self.hourAngleRefract:      float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
         
         # Horizontal coordinates:
-        self._altitude:           float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
-        self.altitudeRefract:     float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
-        self.azimuthRefract:      float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
+        self._altitudeUncorr:       float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
+        self.altitudeRefract:       float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
+        self.azimuthRefract:        float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
         
         
         # Rise, transit and set time:
-        self.riseTime:            float = 0.0;      """Rise time of the Sun (hours UT)"""
-        self.transitTime:         float = 0.0;      """Transit time of the Sun (hours UT)"""
-        self.setTime:             float = 0.0;      """Set time of the Sun (hours UT)"""
+        self.riseTime:              float = 0.0;      """Rise time of the Sun (hours UT)"""
+        self.transitTime:           float = 0.0;      """Transit time of the Sun (hours UT)"""
+        self.setTime:               float = 0.0;      """Set time of the Sun (hours UT)"""
         
         # Rise, transit and set position:
-        self.riseAzimuth:         float = 0.0;      """Rise azimuth of the Sun (radians)"""
-        self.transitAltitude:     float = 0.0;      """Transit altitude of the Sun (radians)"""
-        self.setAzimuth:          float = 0.0;      """Set azimuth of the Sun (radians)"""
+        self.riseAzimuth:           float = 0.0;      """Rise azimuth of the Sun (radians)"""
+        self.transitAltitude:       float = 0.0;      """Transit altitude of the Sun (radians)"""
+        self.setAzimuth:            float = 0.0;      """Set azimuth of the Sun (radians)"""
         
         
     
@@ -171,8 +171,8 @@ class Position(Constants, Parameters):
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self.rightAscension   = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
-        self.declination      = np.arcsin(sinObl*sinLon)
+        self.rightAscensionUncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
+        self.declinationUncorr     = np.arcsin(sinObl*sinLon)
         
         return
     
@@ -191,14 +191,14 @@ class Position(Constants, Parameters):
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
         self.azimuthRefract, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
-                                                     self.rightAscension, self.declination, self._agst)
+                                                     self.rightAscensionUncorr, self.declinationUncorr, self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
-        self._altitude = alt
+        self._altitudeUncorr = alt
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
@@ -302,10 +302,10 @@ class Position(Constants, Parameters):
         """
         
         self.longitude *= self._R2D
-        self.rightAscension *= self._R2D
-        self.declination *= self._R2D
+        self.rightAscensionUncorr *= self._R2D
+        self.declinationUncorr *= self._R2D
         
-        self._altitude *= self._R2D
+        self._altitudeUncorr *= self._R2D
         self.azimuthRefract *= self._R2D
         self.altitudeRefract *= self._R2D
         
