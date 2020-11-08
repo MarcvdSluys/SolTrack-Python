@@ -83,9 +83,9 @@ class SolTrack(Location, Time, Position):
         self._computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # Derived expressions for time, to be reused:
-        self._tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
-        self._tJC  = self._tJD/36525.0                             # Time in Julian centuries since 2000.0
-        self._tJC2 = self._tJC**2                                  # T^2
+        self._tJD  = self.julianDay - 2451545.0     # Time in Julian days since 2000.0
+        self._tJC  = self._tJD/36525.0              # Time in Julian centuries since 2000.0
+        self._tJC2 = self._tJC**2                   # T^2
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
@@ -109,8 +109,8 @@ class SolTrack(Location, Time, Position):
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._useDegrees):
-            self.geoLongitude *= self._R2D  # Convert back to original
-            self.geoLatitude  *= self._R2D  # Convert back to original
+            self.geoLongitude *= self._R2D     # Convert back to original
+            self.geoLatitude  *= self._R2D     # Convert back to original
             self._convertRadiansToDegrees()    # Convert final results
         
         return
@@ -133,8 +133,8 @@ class SolTrack(Location, Time, Position):
         
         """
         
-        rsa = -0.8333/self._R2D              # Standard altitude for the Sun in radians
-        if(abs(rsAlt) > 1.e-9): rsa = rsAlt     # Use a user-specified altitude
+        rsa = -0.8333/self._R2D               # Standard altitude for the Sun in radians
+        if(abs(rsAlt) > 1.e-9): rsa = rsAlt   # Use a user-specified altitude
         
         tmRad = np.zeros(3)
         azalt = np.zeros(3)
@@ -162,7 +162,7 @@ class SolTrack(Location, Time, Position):
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
         cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st._declinationUncorr)) / (np.cos(st.geoLatitude) *
-                                                                                         np.cos(st._declinationUncorr))
+                                                                                          np.cos(st._declinationUncorr))
         
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
