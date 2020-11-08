@@ -78,17 +78,9 @@ class SolTrack(Location, Time, Position):
         
         
         
-    def computeSunPosition(self, time):
+    def computeSunPosition(self):
         
-        """
-        Main function to compute the position of the Sun.
-        
-        Parameters:
-          time                  (Time):  Class containing date and time to compute the position for, in UT.
-        
-        Returns:
-          (Position):  Class containing the position of the Sun in horizontal (and equatorial if desired) coordinates (output).
-        
+        """ Method to compute the position of the Sun.
         """
                 
         if(self.param.useDegrees):
@@ -101,7 +93,7 @@ class SolTrack(Location, Time, Position):
         
         
         # Compute the Julian Day from the date and time:
-        self.computeJulianDay(time.year, time.month, time.day, time.hour, time.minute, time.second)
+        self.computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # Derived expressions for time, to be reused:
         self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
@@ -182,7 +174,7 @@ class SolTrack(Location, Time, Position):
         st.setDateTime(time.year, time.month, time.day, 0,0,0.0)
         
         # Compute the Sun's position:
-        st.computeSunPosition(st)
+        st.computeSunPosition()
         
         
         # Compute transit, rise and set times:
@@ -212,7 +204,7 @@ class SolTrack(Location, Time, Position):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
-                st.computeSunPosition(st)
+                st.computeSunPosition()
                 
                 ha  = self.revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declination) +
