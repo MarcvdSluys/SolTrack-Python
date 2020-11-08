@@ -36,7 +36,7 @@ class Position(Constants, Parameters):
         
     
     
-    def computeJulianDay(self, year, month, day,  hour, minute, second):
+    def _computeJulianDay(self, year, month, day,  hour, minute, second):
         """Compute the Julian Day from the date and time.
         
         Note:
@@ -70,7 +70,7 @@ class Position(Constants, Parameters):
     
     
     
-    def computeLongitude(self, computeDistance=False):
+    def _computeLongitude(self, computeDistance=False):
         """Compute the ecliptic longitude of the Sun for a given instant.
         
         Note:
@@ -118,7 +118,7 @@ class Position(Constants, Parameters):
     
     
     
-    def convertEclipticToEquatorial(self, longitude, cosObliquity):
+    def _convertEclipticToEquatorial(self, longitude, cosObliquity):
         """Convert ecliptic coordinates to equatorial coordinates.
         
         Note:
@@ -145,7 +145,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def convertEquatorialToHorizontal(self):
+    def _convertEquatorialToHorizontal(self):
         """Convert equatorial to horizontal coordinates.
         
         Also corrects for parallax and atmospheric refraction.
@@ -158,8 +158,8 @@ class Position(Constants, Parameters):
         
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
-        self.azimuthRefract, sinAlt = self.eq2horiz(self.sinLat,self.cosLat, self.geoLongitude,
-                                                    self.rightAscension, self.declination, self.agst)
+        self.azimuthRefract, sinAlt = self._eq2horiz(self.sinLat,self.cosLat, self.geoLongitude,
+                                                     self.rightAscension, self.declination, self.agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
@@ -178,7 +178,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def eq2horiz(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
+    def _eq2horiz(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
         """Convert equatorial coordinates to horizontal coordinates.
         
         Parameters:
@@ -213,8 +213,7 @@ class Position(Constants, Parameters):
         return azimuth, sinAlt
     
     
-    def convertHorizontalToEquatorial(self, sinLat, cosLat, azimuth, altitude):
-        
+    def _convertHorizontalToEquatorial(self, sinLat, cosLat, azimuth, altitude):
         """Convert (refraction-corrected) horizontal coordinates to equatorial coordinates.
         
         Parameters:
@@ -246,7 +245,7 @@ class Position(Constants, Parameters):
     
     
     
-    def setNorthToZero(self, azimuthRefract, hourAngleRefract):
+    def _setNorthToZero(self, azimuthRefract, hourAngleRefract):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -273,7 +272,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def convertRadiansToDegrees(self):
+    def _convertRadiansToDegrees(self):
         """Convert final results from radians to degrees.
         
         Note:
@@ -296,7 +295,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def revPI(self, angle):
+    def _revPI(self, angle):
         """Fold an angle in radians to take a value between -PI and +PI.
         
         Parameters:

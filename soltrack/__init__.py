@@ -82,7 +82,7 @@ class SolTrack(Location, Time, Position):
         
         
         # Compute the Julian Day from the date and time:
-        self.computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        self._computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # Derived expressions for time, to be reused:
         self.tJD  = self.julianDay - 2451545.0                   # Time in Julian days since 2000.0
@@ -91,27 +91,27 @@ class SolTrack(Location, Time, Position):
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
-        self.computeLongitude(self.param.computeDistance)
+        self._computeLongitude(self.param.computeDistance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
+        self._convertEclipticToEquatorial(self.longitude, self.cosObliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
-        self.convertEquatorialToHorizontal()
+        self._convertEquatorialToHorizontal()
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(self.param.computeRefrEquatorial):
-            self.convertHorizontalToEquatorial(self.sinLat, self.cosLat, self.azimuthRefract,
-                                               self.altitudeRefract)
+            self._convertHorizontalToEquatorial(self.sinLat, self.cosLat, self.azimuthRefract,
+                                                self.altitudeRefract)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(self.param.useNorthEqualsZero):
-            self.setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
+            self._setNorthToZero(self.azimuthRefract, self.hourAngleRefract)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param.useDegrees):
-            self.convertRadiansToDegrees()
+            self._convertRadiansToDegrees()
             
             self.geoLongitude *= self.cst.R2D
             self.geoLatitude  *= self.cst.R2D
@@ -189,13 +189,13 @@ class SolTrack(Location, Time, Position):
                 st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 st.computeSunPosition()
                 
-                ha  = self.revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
+                ha  = self._revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declination) +
                                 np.cos(st.geoLatitude)*np.cos(st.declination)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
-                    dTmRad = -self.revPI(ha)  # -PI - +PI
+                    dTmRad = -self._revPI(ha)  # -PI - +PI
                 else:                 # Rise/set
                     dTmRad = (alt-rsa)/(np.cos(st.declination)*np.cos(st.geoLatitude)*np.sin(ha))
                     
