@@ -131,16 +131,11 @@ class SolTrack(Location, Time, Position):
     
     
     
-    def computeSunRiseSet(self, location, time, rsAlt=0.0):
+    def computeSunRiseSet(self, rsAlt=0.0):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
-          location           (Location):  Class containing the geographic location to compute the Sun's rise and set times for.
-          time               (Time):      Class containing date and time to compute the position for, in UT.
           rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
-        
-        Returns:
-          (RiseSet):   Class containing the Sun's rise, transit and set data.
         
         Note:
           - if rsAlt == 0.0, actual rise and set times are computed
@@ -163,15 +158,14 @@ class SolTrack(Location, Time, Position):
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
         if(self.param.useDegrees):
-            st = SolTrack(location.geoLongitude/self.cst.R2D, location.geoLatitude/self.cst.R2D,
-                          useDegrees=False, useNorthEqualsZero=False, computeRefrEquatorial=True,
-                          computeDistance=False)
-        else:
-            st = SolTrack(location.geoLongitude, location.geoLatitude, useDegrees=False,
+            st = SolTrack(self.geoLongitude/self.cst.R2D, self.geoLatitude/self.cst.R2D, useDegrees=False,
                           useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
+        else:
+            st = SolTrack(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
+                          computeRefrEquatorial=True, computeDistance=False)
         
         # Set date and time to midnight of the desired date:
-        st.setDateTime(time.year, time.month, time.day, 0,0,0.0)
+        st.setDateTime(self.year, self.month, self.day, 0,0,0.0)
         
         # Compute the Sun's position:
         st.computeSunPosition()
