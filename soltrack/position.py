@@ -23,15 +23,17 @@
 from dataclasses import dataclass
 import numpy as np
 
-from .data import Constants
+from .data import Constants, Parameters
 
 
 @dataclass
-class Position(Constants):
+class Position(Constants, Parameters):
     """Class containing the position of the Sun and related attributes and methods."""
+
     
-    def __init__(self, param):
-        self.param = param
+    def __init__(self):
+        Parameters.__init__(self)
+        
     
     
     def computeJulianDay(self, year, month, day,  hour, minute, second):

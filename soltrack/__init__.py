@@ -31,15 +31,14 @@ from .data import Constants, Parameters
 from .location import Location
 from .time import Time
 from .position import Position
-from .riseset import RiseSet
 
 
 @dataclass
-# class SolTrack(Parameters, Location, Time, Position, RiseSet):
 class SolTrack(Location, Time, Position):
     
     
     def __init__(self, geoLongitude,geoLatitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+        
         """Construct a SolTrack object with specified geographical location and parameters (settings).
         
         Parameters:
@@ -50,30 +49,20 @@ class SolTrack(Location, Time, Position):
           useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
           computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
           computeDistance (bool):         Compute the distance to the Sun.
-
+        
         """
         
         self.cst       = Constants()
         
         self.param     = Parameters()
         self.param.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
-        # Parameters.__init__(self)
-        # self.setParameters(useDegrees,useNorthEqualsZero, computeRefrEquatorial,computeDistance)
         
         Location.__init__(self)
-        # self.loc       = Location()
-        # print(self.loc.latitude)
         self.setLocation(geoLongitude, geoLatitude)
-        # print(self.latitude)
         
         Time.__init__(self)
-        # self.time      = Time()
         
-        # Position.__init__(self, self.param)
-        self.pos       = Position(self.param)
-        
-        # RiseSet.__init__(self, self.param)
-        self.riseSet   = RiseSet(self.param)
+        Position.__init__(self)
         
         
         
