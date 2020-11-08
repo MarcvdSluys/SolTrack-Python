@@ -39,12 +39,12 @@ from .riseset import RiseSet
 class SolTrack(Location, Time, Position):
     
     
-    def __init__(self, longitude,latitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+    def __init__(self, geoLongitude,geoLatitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
         """Construct a SolTrack object with specified geographical location and parameters (settings).
         
         Parameters:
-          longitude (float):              Geographical longitude of the observer or installation (radians or degrees, depending on useDegrees).
-          latitude (float):               Geographical latitude of the observer or installation (radians or degrees, depending on useDegrees).
+          geoLongitude (float):           Geographical longitude of the observer or installation (radians or degrees, depending on useDegrees).
+          geoLatitude (float):            Geographical latitude of the observer or installation (radians or degrees, depending on useDegrees).
         
           useDegrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
           useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
@@ -63,7 +63,7 @@ class SolTrack(Location, Time, Position):
         Location.__init__(self)
         # self.loc       = Location()
         # print(self.loc.latitude)
-        self.setLocation(longitude, latitude)
+        self.setLocation(geoLongitude, geoLatitude)
         # print(self.latitude)
         
         Time.__init__(self)
@@ -78,13 +78,12 @@ class SolTrack(Location, Time, Position):
         
         
         
-    def computeSunPosition(self, location, time):
+    def computeSunPosition(self, time):
         
         """
         Main function to compute the position of the Sun.
         
         Parameters:
-          location          (Location):  Class containing the geographic location to compute the Sun's position for.
           time                  (Time):  Class containing date and time to compute the position for, in UT.
         
         Returns:
@@ -92,17 +91,13 @@ class SolTrack(Location, Time, Position):
         
         """
                 
-        # If the used uses degrees, convert the geographic location to radians:
-        # In C, a local copy of location is made.  With Python objects, we need a deep copy.
-        import copy
-        loc = copy.deepcopy(location)  # Local instance of the Location class, so that it can be changed here
         if(self.param.useDegrees):
-            loc.geoLongitude /= self.cst.R2D
-            loc.geoLatitude  /= self.cst.R2D
+            self.geoLongitude /= self.cst.R2D
+            self.geoLatitude  /= self.cst.R2D
         
         # Compute these once and reuse:
-        loc.sinLat = np.sin(loc.geoLatitude)
-        loc.cosLat = np.sqrt(1.0 - loc.sinLat**2)  # Cosine of a latitude is always positive or zero
+        self.sinLat = np.sin(self.geoLatitude)
+        self.cosLat = np.sqrt(1.0 - self.sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
         # Compute the Julian Day from the date and time:
@@ -121,12 +116,12 @@ class SolTrack(Location, Time, Position):
         self.convertEclipticToEquatorial(self.longitude, self.cosObliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
-        self.convertEquatorialToHorizontal(loc)
+        self.convertEquatorialToHorizontal()
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(self.param.computeRefrEquatorial):
-            self.convertHorizontalToEquatorial(loc.sinLat, loc.cosLat, self.azimuthRefract,
+            self.convertHorizontalToEquatorial(self.sinLat, self.cosLat, self.azimuthRefract,
                                                self.altitudeRefract)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
@@ -137,6 +132,9 @@ class SolTrack(Location, Time, Position):
         if(self.param.useDegrees):
             self.convertRadiansToDegrees()
             
+            self.geoLongitude *= self.cst.R2D
+            self.geoLatitude  *= self.cst.R2D
+        
         return
     
     
@@ -184,7 +182,7 @@ class SolTrack(Location, Time, Position):
         st.setDateTime(time.year, time.month, time.day, 0,0,0.0)
         
         # Compute the Sun's position:
-        st.computeSunPosition(st, st)
+        st.computeSunPosition(st)
         
         
         # Compute transit, rise and set times:
@@ -214,7 +212,7 @@ class SolTrack(Location, Time, Position):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
-                st.computeSunPosition(st, st)
+                st.computeSunPosition(st)
                 
                 ha  = self.revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declination) +

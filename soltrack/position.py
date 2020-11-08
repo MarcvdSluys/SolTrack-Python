@@ -143,13 +143,10 @@ class Position(Constants):
         return
     
     
-    def convertEquatorialToHorizontal(self, location):
+    def convertEquatorialToHorizontal(self):
         """Convert equatorial to horizontal coordinates.
         
         Also corrects for parallax and atmospheric refraction.
-        
-        Parameters:
-          location (Location):  Class containing the geographic location of the observer (rad).
         
         """
         
@@ -159,7 +156,7 @@ class Position(Constants):
         
         sinAlt=0.0
         # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuthRefract' variable directly:
-        self.azimuthRefract, sinAlt = self.eq2horiz(location.sinLat,location.cosLat, location.geoLongitude,
+        self.azimuthRefract, sinAlt = self.eq2horiz(self.sinLat,self.cosLat, self.geoLongitude,
                                                     self.rightAscension, self.declination, self.agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
@@ -171,7 +168,7 @@ class Position(Constants):
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
-        dalt *= location.pressure/101.0 * 283.0/location.temperature
+        dalt *= self.pressure/101.0 * 283.0/self.temperature
         alt += dalt
         # to do: add pressure/temperature dependence
         self.altitudeRefract = alt
