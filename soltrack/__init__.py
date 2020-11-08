@@ -66,7 +66,7 @@ class SolTrack(Location, Time, Position):
         
         
         
-    def computeSunPosition(self):
+    def computePosition(self):
         
         """ Method to compute the position of the Sun.
         """
@@ -119,7 +119,7 @@ class SolTrack(Location, Time, Position):
     
     
     
-    def computeSunRiseSet(self, rsAlt=0.0):
+    def computeRiseSet(self, rsAlt=0.0):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
@@ -156,7 +156,7 @@ class SolTrack(Location, Time, Position):
         st.setDateTime(self.year, self.month, self.day, 0,0,0.0)
         
         # Compute the Sun's position:
-        st.computeSunPosition()
+        st.computePosition()
         
         
         # Compute transit, rise and set times:
@@ -187,7 +187,7 @@ class SolTrack(Location, Time, Position):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]   # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*self.R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
-                st.computeSunPosition()
+                st.computePosition()
                 
                 ha  = self._revPI(th0 + st.geoLongitude - st.rightAscension)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st.declination) +
