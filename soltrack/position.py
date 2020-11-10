@@ -56,17 +56,59 @@ class Position(Constants, Parameters):
         self.azimuth:                float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
         
         
-        # Rise, transit and set time:
-        self.riseTime:               float = 0.0;      """Rise time of the Sun (hours UT)"""
-        self.transitTime:            float = 0.0;      """Transit time of the Sun (hours UT)"""
-        self.setTime:                float = 0.0;      """Set time of the Sun (hours UT)"""
+    
+    
+    def computePosition(self):
         
-        # Rise, transit and set position:
-        self.riseAzimuth:            float = 0.0;      """Rise azimuth of the Sun (radians)"""
-        self.transitAltitude:        float = 0.0;      """Transit altitude of the Sun (radians)"""
-        self.setAzimuth:             float = 0.0;      """Set azimuth of the Sun (radians)"""
+        """ Method to compute the position of the Sun.
+        """
+                
+        # If the user uses degrees, convert the geographic location to radians:
+        if(self.param._useDegrees):
+            self.geoLongitude /= self._R2D
+            self.geoLatitude  /= self._R2D
+        
+        # Compute these once and reuse:
+        self._sinLat = np.sin(self.geoLatitude)
+        self._cosLat = np.sqrt(1.0 - self._sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
+        # Compute the Julian Day from the date and time:
+        self._computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        
+        # Derived expressions for time, to be reused:
+        self._tJD  = self.julianDay - 2451545.0     # Time in Julian days since 2000.0
+        self._tJC  = self._tJD/36525.0              # Time in Julian centuries since 2000.0
+        self._tJC2 = self._tJC**2                   # T^2
+        
+        
+        # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
+        self._computeLongitude(self.param._computeDistance)
+        
+        # Convert ecliptic coordinates to geocentric equatorial coordinates:
+        self._convertEclipticToEquatorial(self.longitude, self._cosObliquity)
+        
+        # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
+        self._convertEquatorialToHorizontal()
+        
+        
+        # Convert the corrected horizontal coordinates back to equatorial coordinates:
+        if(self.param._computeRefrEquatorial):
+            self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuth,
+                                                self.altitude)
+            
+        # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
+        if(self.param._useNorthEqualsZero):
+            self._setNorthToZero(self.azimuth, self.hourAngle)
+            
+        # If the user wants degrees, convert final results from radians to degrees:
+        if(self.param._useDegrees):
+            self.geoLongitude *= self._R2D     # Convert back to original
+            self.geoLatitude  *= self._R2D     # Convert back to original
+            self._convertRadiansToDegrees()    # Convert final results
+        
+        return
+    
     
     
     def _computeJulianDay(self, year, month, day,  hour, minute, second):
