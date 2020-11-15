@@ -21,9 +21,10 @@ class Constants:
     """Class containing SolTrack constants."""
     
     _PI:     float     = 3.14159265358979323846;   """Pi"""
-    _TWOPI: float     = 6.28318530717958647693;   """2 pi"""
+    _TWOPI:  float     = 6.28318530717958647693;   """2 pi"""
     _R2D:    float     = 57.2957795130823208768;   """Radians to degrees conversion factor"""
     _R2H:    float     = 3.81971863420548805845;   """Radians to hours conversion factor"""
+    _D2R:    float     = 0.01745329251994329576;   """Degrees to radians conversion factor"""
 
 
 

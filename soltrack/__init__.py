@@ -26,7 +26,7 @@ name = "soltrack"
 
 from dataclasses import dataclass
 
-from .data      import Parameters
+from .data      import Constants, Parameters
 from .location  import Location
 from .time      import Time
 from .position  import Position
@@ -50,16 +50,19 @@ class SolTrack(Location, Time, Position, RiseSet):
           computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
           computeDistance (bool):         Compute the distance to the Sun.
         
+        Note:
+          The SolTrack class is a composition of the Location, Time, Position and RiseSet classes.
+        
         """
         
+        # Create Constants and Parameters objects:
+        self.cst       = Constants()
         self.param     = Parameters()
         self.param.setParameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
         
-        Location.__init__(self, geoLongitude, geoLatitude)
-        
+        # Use composition to obtain the attributes from Location, Time, Position and RiseSet:
+        Location.__init__(self, geoLongitude, geoLatitude)  # Set the geographic location
         Time.__init__(self)
-        
         Position.__init__(self)
-        
         RiseSet.__init__(self)
         
