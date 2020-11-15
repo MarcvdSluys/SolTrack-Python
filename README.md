@@ -31,7 +31,7 @@ already.  If you are installing by hand, ensure that these packages are installe
 The update from SolTrack v0.0.2 to v0.1.0 is **not backwards compatible**.  The code has been made object
 oriented, which should not affect its performance, but does affect its use.  We've done our best to ensure that
 this happens only once.  To help achieving that, we have made some smaller changes in the same update, like a
-renaming of two functions (`computeSunPosition()` `->` `computePosition()` and `computeSunRiseSet()` `->`
+renaming of two functions (`computeSunPosition()` -> `computePosition()` and `computeSunRiseSet()` ->
 `computeRiseSet()`).  In addition, the parameters `computeRefrEquatorial` and `computeDistance` are now `True`
 by default.
 
@@ -55,7 +55,9 @@ st.computeRiseSet()   # Compute rise and set times
 ```
 
 The output used to be stored in attributes of the `loc`, `time`, `pos` and `riseSet` objects, but these are
-now all attributes of the `st` object.
+now all attributes of the `st` object.  The refraction-corrected variables `declinationRefract`, `hourAngleRefract`,
+`azimuthRefract` and `altitudeRefract` have lost their `Refract` postfix.  Conversely, the uncorrected
+variables are now called `rightAscensionUncorr`, `declinationUncorr` and `_altitudeUncorr`.
 
 
 ### Example use for SolTrack v0.1.0 or later ###
@@ -190,7 +192,7 @@ print()
 ## Author and licence ##
 
 * Author: Marc van der Sluys
-* Contact: http://han.vandersluys.nl/en/
+* Contact: http://marc.vandersluys.nl
 * Licence: [GPLv3+](https://www.gnu.org/licenses/gpl.html)
 
 
@@ -198,5 +200,5 @@ print()
 
 * [Celestial mechanics in a nutshell (CMiaNS)](https://cmians.sourceforge.io/)
 * Meeus, [Astronomical algorithms](https://www.willbell.com/math/MC1.HTM), 2nd Ed.
-* This C and Python codes are adapted from the Fortran implementation in
+* The C and Python codes have been adapted from the Fortran implementation in
   [libTheSky](http://libthesky.sourceforge.net/), which contains many references.
