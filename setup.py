@@ -19,7 +19,7 @@ setup(
     url='http://soltrack.sf.net',
     
     packages=['soltrack'],
-    install_requires=['numpy','dataclasses','datetime','pytz'],
+    install_requires=['numpy','dataclasses','pytz'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     
