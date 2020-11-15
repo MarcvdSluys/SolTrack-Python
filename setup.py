@@ -1,17 +1,16 @@
 #!/bin/env python3
 
-version="0.0.2"
+"""Setup.py for the SolTrack Python package."""
 
-import os
-# os.system('rm -rf *.egg-info/')        # Make 'really clean'
+# Package version:
+version="0.1.0"
 
-# Prevent the setuptools_scm plugin from adding (only) the contents of the git repo to the tarball:
-os.system('mv -f ../.git ../.git_temp')
-
+# Get long description from README.md:
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
 
+# Set package properties:
 from setuptools import setup
 setup(
     name='soltrack',
@@ -20,13 +19,13 @@ setup(
     url='http://soltrack.sf.net',
     
     packages=['soltrack'],
-    install_requires=['numpy','dataclasses'],
+    install_requires=['numpy','dataclasses','datetime','pytz'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     
     version=version,
     license='GPLv3+',
-    keywords=['astronomy','ephemeris','sun','solar'],
+    keywords=['astronomy','ephemeris','sun','solar','solar energy'],
     
     classifiers=[
         "Development Status :: 4 - Beta",
@@ -42,16 +41,4 @@ setup(
         "Topic :: Scientific/Engineering :: Physics",
     ]
 )
-
-# Put git repo back:
-os.system('mv -f ../.git_temp ../.git')
-
-# Do some basic checks:
-print("\nPython source files included in tarball:")
-os.system('tar tfz dist/soltrack-'+version+r'.tar.gz |grep -E "\.py"')
-print()
-
-os.system('twine check dist/soltrack-'+version+'.tar.gz')
-os.system('twine check dist/soltrack-'+version+'-py3-none-any.whl')
-print()
 
