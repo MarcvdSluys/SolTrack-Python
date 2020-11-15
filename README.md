@@ -2,6 +2,8 @@
 
 ![PyPI](https://img.shields.io/pypi/v/soltrack?color=%230A0)
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/soltrack)
+[![Documentation
+Status](https://readthedocs.org/projects/soltrack/badge/?version=latest)](https://soltrack.readthedocs.io/en/latest/?badge=latest)
 ![PyPI - License](https://img.shields.io/pypi/l/soltrack?color=%230A0)
 
 A free, fast and simple Python package to compute the position of the Sun, as well as its rise and set times.
