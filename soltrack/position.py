@@ -192,34 +192,34 @@ class Position(Constants, Parameters):
         
         """
         
+        # We need the AGST for the coordinate transformation:
         gmst       = 4.89496121 + 6.300388098985*self._tJD + 6.77e-6*self._tJC2  # Greenwich mean sidereal time
         self._agst = gmst + self._nutationLon * self._cosObliquity               # Correction for equation of the equinoxes . apparent Greenwich sidereal time
         
         
-        sinAlt=0.0
-        # Azimuth does not need to be corrected for parallax or refraction, hence store the result in the 'azimuth' variable directly:
-        self.azimuth, sinAlt = self._eq2horiz(self._sinLat,self._cosLat, self.geoLongitude,
-                                              self._rightAscensionUncorr, self._declinationUncorr, self._agst)
+        # Do the actual coordinate transformation:
+        self.azimuth, sinAlt = self._eq2horizCT(self._sinLat,self._cosLat, self.geoLongitude,
+                                                self._rightAscensionUncorr, self._declinationUncorr,
+                                                self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
-        self._altitudeUncorr = alt
+        self._altitudeUncorr = alt                                 # Sun altitude, uncorrected for refraction
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
         dalt *= self.pressure/101.0 * 283.0/self.temperature
         alt += dalt
-        # to do: add pressure/temperature dependence
-        self.altitude = alt
+        self.altitude = alt                                        # Sun altitude, corrected for atmospheric refraction
         
         return
     
     
-    def _eq2horiz(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
-        """Convert equatorial coordinates to horizontal coordinates.
+    def _eq2horizCT(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
+        """The actual coordinate transformation to convert equatorial to horizontal coordinates.
         
         Parameters:
           sinLat         (float):  Sine of the geographic latitude of the observer.
