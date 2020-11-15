@@ -23,7 +23,7 @@ class Time:
     """Class containing the date and time (in UT) to compute the Sun position for."""
     
     
-    def setDateTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
+    def setDateAndTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
         """Set the SolTrack date and time using UTC year, month, day, hour, minute and second.
         
            Parameters:

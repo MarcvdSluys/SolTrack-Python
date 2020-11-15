@@ -73,7 +73,7 @@ class RiseSet(Constants, Parameters):
                                 computeRefrEquatorial=True, computeDistance=False)
         
         # Set date and time to midnight of the desired date:
-        st.setDateTime(self.year, self.month, self.day, 0,0,0.0)
+        st.setDateAndTime(self.year, self.month, self.day, 0,0,0.0)
         
         # Compute the Sun's position:
         st.computePosition()
