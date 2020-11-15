@@ -35,6 +35,9 @@ class Time:
              minute (int):    minute of time  (default=0).
              second (float):  second of time  (default=0).
         
+           Note:
+             Use setDateTime() instead if you have a Python datetime object.
+        
         """
         
         # If a Time object does not yet exist, create it:
@@ -52,15 +55,19 @@ class Time:
         return
     
     
-    def datetime2st(self, dtObj):
-        """Set the SolTrack date and time using a (local) datetime object.
+    def setDateTime(self, dtObj):
+        """Set the SolTrack date and time using a (local) Python datetime object.
         
-           Args:
+           Parameters:
                dtObj (datetime):  Date and time in a Python datetime object.
                
            Returns:
                Time:  Date and time in a SolTrack time object.
         
+           Note:
+             Use setDateAndTime() instead if you have year, month,day, hour, minute and second as separate
+             variables.
+
         """
         
         utc         = dtObj.astimezone(tz.utc)  # Convert from local time to UTC
@@ -82,7 +89,7 @@ class Time:
            Returns:
                Current system date and time in a SolTrack time object.
         """
-        self.datetime2st(dt.datetime.now())
+        self.setDateTime(dt.datetime.now())
         
         return
         
