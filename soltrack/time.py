@@ -14,6 +14,7 @@
 
 
 from dataclasses import dataclass
+import numpy as np
 import datetime as dt
 import pytz as tz
 
@@ -94,3 +95,37 @@ class Time:
         return
         
         
+    def _computeJulianDay(self, year, month, day,  hour, minute, second):
+        """Compute the Julian Day from the date and time.
+        
+        Note:
+          - Gregorian calendar only (>~1582).
+        
+        Parameters:
+          year    (int):    Year of date.
+          month   (int):   Month of date.
+          day     (int):     Day of date.
+          hour    (int):    Hour of time.
+          minute  (int):  Minute of time.
+          second  (int):  Second of time.
+        
+        Returns:
+          float:  Julian day for the given date and time.
+        
+        """
+        
+        if(month <= 2):  # Treat Jan, Feb as months 13, 14 of the previous year
+            year  -= 1
+            month += 12
+            
+        tmp1 = np.floor(year/100.0)
+        tmp2 = 2 - tmp1 + np.floor(tmp1/4.0)
+        
+        dDay = day + hour/24.0 + minute/1440.0 + second/86400.0
+        
+        self.julianDay = np.floor(365.250*(year+4716)) + np.floor(30.60010*(month+1)) + dDay + tmp2 - 1524.5
+        
+        return
+    
+    
+    
