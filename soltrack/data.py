@@ -34,8 +34,8 @@ class Parameters:
     
     _useDegrees:             bool  = False;   """Input (geographic position) and output are in degrees."""
     _useNorthEqualsZero:     bool  = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East."""
-    _computeRefrEquatorial:  bool  = False;   """Compute refraction-corrected equatorial coordinates (Hour angle, declination)."""
-    _computeDistance:        bool  = False;   """Compute the distance to the Sun."""
+    _computeRefrEquatorial:  bool  = True;    """Compute refraction-corrected equatorial coordinates (Hour angle, declination)."""
+    _computeDistance:        bool  = True;    """Compute the distance to the Sun."""
     
     
     def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
@@ -49,9 +49,9 @@ class Parameters:
           computeDistance (bool):         Compute the distance to the Sun.
         """
         
-        if(useDegrees):             self._useDegrees             = useDegrees
-        if(useNorthEqualsZero):     self._useNorthEqualsZero     = useNorthEqualsZero
-        if(computeRefrEquatorial):  self._computeRefrEquatorial  = computeRefrEquatorial
-        if(computeDistance):        self._computeDistance        = computeDistance
+        if(useDegrees is not None):             self._useDegrees             = useDegrees
+        if(useNorthEqualsZero is not None):     self._useNorthEqualsZero     = useNorthEqualsZero
+        if(computeRefrEquatorial is not None):  self._computeRefrEquatorial  = computeRefrEquatorial
+        if(computeDistance is not None):        self._computeDistance        = computeDistance
         
         return

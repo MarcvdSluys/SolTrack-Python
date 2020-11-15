@@ -82,7 +82,7 @@ class Position(Constants, Parameters):
         self._tJC2 = self._tJC**2                   # T^2
         
         
-        # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic:
+        # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic and nutation:
         self._computeLongitude(self.param._computeDistance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
@@ -111,15 +111,16 @@ class Position(Constants, Parameters):
     
     
     
-    def _computeLongitude(self, computeDistance=False):
+    def _computeLongitude(self, computeDistance=True):
         """Compute the ecliptic longitude of the Sun for a given instant.
         
         Note:
-          - Also computes the obliquity of the ecliptic and nutation.
+          - Also computes and stores the obliquity of the ecliptic and nutation.
         
         Parameters:
-          computeDistance (bool):  Compute distance to the Sun (optional, default=False).
-        
+          computeDistance (bool):  Compute distance to the Sun.  Note that this results in a marginally better
+                                   longitude as well.  (optional, default=True).
+
         """
         
         l0 = 4.895063168 + 628.331966786 * self._tJC  +  5.291838e-6 * self._tJC2        # Mean longitude
