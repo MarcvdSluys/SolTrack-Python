@@ -26,15 +26,39 @@ already.  If you are installing by hand, ensure that these packages are installe
 
 ## Example use ##
 
-The update from SolTrack v0.0.2 to v0.1.0 is *not backwards compatible!*  The code has been made object
-oriented, which does not affect its performance, but does affect its use.  We've done our best to ensure that
-this happens only once.  To help achieving that, we have made some smaller changes, like a renaming of two
-functions (`computeSunPosition()` `->` `computePosition()` and `computeSunRiseSet()` `->`
+### Update from v0.0.2 to v0.1.0 ###
+
+The update from SolTrack v0.0.2 to v0.1.0 is **not backwards compatible**.  The code has been made object
+oriented, which should not affect its performance, but does affect its use.  We've done our best to ensure that
+this happens only once.  To help achieving that, we have made some smaller changes in the same update, like a
+renaming of two functions (`computeSunPosition()` `->` `computePosition()` and `computeSunRiseSet()` `->`
 `computeRiseSet()`).  In addition, the parameters `computeRefrEquatorial` and `computeDistance` are now `True`
 by default.
 
+The main sequence of statements has changed as follows:
+```python
+# Before v0.1.0:
+import soltrack as st
+loc = st.Location(5.950270, 51.987380)  # Set geographical location
+time = st.Time(2045, 7, 16,  6, 2, 49.217348)  # Set date and time
+pos = st.computeSunPosition(loc, time, useDegrees=True, useNorthEqualsZero=True, computeRefrEquatorial=True,
+                            computeDistance=True)  # Compute positions
+riseSet = st.computeSunRiseSet(loc, time, 0.0, useDegrees=True, useNorthEqualsZero=True)  # Compute rise and set times
 
-### Starting from v0.1.0 ###
+# Starting with v0.1.0:
+from soltrack import SolTrack
+st = SolTrack(5.950270,51.987380, useDegrees=True, useNorthEqualsZero=False, computeRefrEquatorial=True,
+              computeDistance=True)  # Create a SolTrack instance and specify preferences
+st.setDateAndTime(2045, 7, 16,  6, 2, 49.217348)  # Set date and time
+st.computePosition()  # Compute position
+st.computeRiseSet()   # Compute rise and set times
+```
+
+The output used to be stored in attributes of the `loc`, `time`, `pos` and `riseSet` objects, but these are
+now all attributes of the `st` object.
+
+
+### Example use for SolTrack v0.1.0 or later ###
 ```python
 """Example Python script to compute the position of the Sun and its rise and set times for a single instant
 and demonstrate some other features."""
@@ -109,7 +133,7 @@ print()
 ```
 
 
-### Before v0.1.0 ###
+### Example use before v0.1.0 ###
 ```python
 """Example Python script to compute the position of the Sun and its rise and set times for a single instant."""
 
