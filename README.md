@@ -188,7 +188,7 @@ print()
 
 * [SourceForge](http://soltrack.sf.net): SolTrack homepage, data files
 * [Pypi](https://pypi.org/project/soltrack/): SolTrack Python package
-* [GitHub](https://github.com/MarcvdSluys/SolTrack): SolTrack source code
+* [GitHub](https://github.com/MarcvdSluys/SolTrack-Python): SolTrack Python source code
 
 
 ## Author and licence ##
