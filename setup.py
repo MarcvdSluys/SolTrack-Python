@@ -3,7 +3,7 @@
 """Setup.py for the SolTrack Python package."""
 
 # Package version:
-version="0.1.2"
+version="0.1.3"
 
 # Get long description from README.md:
 with open("README.md", "r") as fh:
