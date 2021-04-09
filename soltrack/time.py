@@ -18,6 +18,7 @@ import numpy as np
 # import pandas as pd
 import datetime as dt
 import pytz as tz
+import astrotool as at
 
 
 @dataclass
@@ -74,18 +75,13 @@ class Time:
         
         if(type(dtObj) is np.datetime64):
             utc = dtObj  # datetime64 does not support timezones, so assume timestamps are already in UTC
-            utc = self.dt64_2_cal(utc)
-        
-            self.year   = utc[0]
-            self.month  = utc[1]
-            self.day    = utc[2]
             
-            self.hour   = utc[3]
-            self.minute = utc[4]
-            self.second = utc[5] + utc[6]/1e6
+            self.year, self.month, self.day, self.hour, self.minute, self.second, us = at.ymdhms_us_from_datetime64(utc)
+            self.second += us/1e6  # Add microseconds to seconds
+            
         else:
             utc = dtObj.astimezone(tz.utc)  # Convert from local time to UTC
-        
+            
             self.year   = utc.year
             self.month  = utc.month
             self.day    = utc.day
@@ -142,33 +138,3 @@ class Time:
     
     
     
-    def dt64_2_cal(self, dt64):
-        """Convert (array of) datetime64 to a calendar (array of) year, month, day, hour, minute, seconds,
-        microsecond with these quantites indexed on the last axis.
-        
-        Parameters:
-          dt64 (datetime64):  (numpy array of) datetime(s) (of arbitrary shape).
-          
-        Returns:
-           uint32 array:  (..., 7) calendar array with last axis representing year, month, day, hour, minute,
-                          second, microsecond.
-        
-        Note:
-          - Nicked from https://stackoverflow.com/a/56260054/1386750
-        """
-        
-        # Allocate output:
-        out = np.empty(dt64.shape + (7,), dtype="u4")
-        
-        # decompose calendar floors:
-        Y, M, D, h, m, s = [dt64.astype(f"M8[{x}]") for x in "YMDhms"]
-        
-        out[..., 0] = Y + 1970                     # Gregorian Year
-        out[..., 1] = (M - Y) + 1                  # month
-        out[..., 2] = (D - M) + 1                  # day
-        out[..., 3] = (dt64 - D).astype("m8[h]")   # hour
-        out[..., 4] = (dt64 - h).astype("m8[m]")   # minute
-        out[..., 5] = (dt64 - m).astype("m8[s]")   # second
-        out[..., 6] = (dt64 - s).astype("m8[us]")  # microsecond
-        
-        return out
