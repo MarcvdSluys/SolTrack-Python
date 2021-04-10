@@ -3,7 +3,7 @@
 """Setup.py for the SolTrack Python package."""
 
 # Package version:
-version="0.1.3"
+version="0.1.4"
 
 # Get long description from README.md:
 with open("README.md", "r") as fh:
@@ -19,7 +19,7 @@ setup(
     url='http://soltrack.sf.net',
     
     packages=['soltrack'],
-    install_requires=['numpy','dataclasses','pytz'],
+    install_requires=['astrotool','dataclasses','numpy','pytz'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     
