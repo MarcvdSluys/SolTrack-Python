@@ -1,12 +1,13 @@
 #!/bin/env python3
+# -*- coding: utf-8 -*-
 
 """Setup.py for the SolTrack Python package."""
 
 # Package version:
-version="0.1.4"
+version='0.1.4'
 
 # Get long description from README.md:
-with open("README.md", "r") as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 
@@ -19,7 +20,7 @@ setup(
     url='http://soltrack.sf.net',
     
     packages=['soltrack'],
-    install_requires=['astrotool','dataclasses','numpy','pytz'],
+    install_requires=['astrotool','colored_traceback','numpy','pytz'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     
@@ -28,17 +29,16 @@ setup(
     keywords=['astronomy','ephemeris','sun','solar','solar energy'],
     
     classifiers=[
-        "Development Status :: 4 - Beta",
-        "Intended Audience :: Developers",
-        "Intended Audience :: Education",
-        "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)",
-        "Natural Language :: English",
-        "Operating System :: OS Independent",
-        "Programming Language :: Python :: 3",
-        "Topic :: Scientific/Engineering",
-        "Topic :: Scientific/Engineering :: Astronomy",
-        "Topic :: Scientific/Engineering :: Physics",
+        'Development Status :: 4 - Beta',
+        'Intended Audience :: Developers',
+        'Intended Audience :: Education',
+        'Intended Audience :: Science/Research',
+        'License :: OSI Approved :: GNU General Public License v3 or later (GPLv3+)',
+        'Natural Language :: English',
+        'Operating System :: OS Independent',
+        'Programming Language :: Python :: 3',
+        'Topic :: Scientific/Engineering',
+        'Topic :: Scientific/Engineering :: Astronomy',
+        'Topic :: Scientific/Engineering :: Physics',
     ]
 )
-

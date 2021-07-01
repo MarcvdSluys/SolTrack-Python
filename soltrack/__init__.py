@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Copyright (c) 2019-2020  Marc van der Sluys - marc.vandersluys.nl
 #   
 #  This file is part of the SolTrack Python package,
@@ -22,7 +23,7 @@ the [SolTrack homepage](http://soltrack.sf.net).
 
 """
 
-name = "soltrack"
+name = 'soltrack'
 
 from dataclasses import dataclass
 

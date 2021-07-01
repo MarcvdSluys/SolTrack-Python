@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 #  Copyright (c) 2019-2020  Marc van der Sluys - marc.vandersluys.nl
 #   
 #  This file is part of the SolTrack Python package,
@@ -131,7 +132,7 @@ class RiseSet(Constants, Parameters):
             
             
             if(iter > 30):  # Convergence failed
-                print("\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n" % (evi,rsAlt))
+                print('\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n' % (evi,rsAlt))
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
             else:               # Result converged, store it
