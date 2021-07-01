@@ -1,4 +1,4 @@
+astrotool==0.0.2
 colored_traceback==0.3.0
 numpy==1.21.0
-astrotool==0.0.2
 pytz==2021.1
