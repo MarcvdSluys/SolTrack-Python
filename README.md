@@ -4,7 +4,7 @@
 ![PyPI - Downloads](https://img.shields.io/pypi/dm/soltrack)
 [![Documentation
 Status](https://readthedocs.org/projects/soltrack/badge/?version=latest)](https://soltrack.readthedocs.io/en/latest/?badge=latest)
-![PyPI - License](https://img.shields.io/pypi/l/soltrack?color=%230A0)
+![PyPI - Licence](https://img.shields.io/pypi/l/soltrack?color=%230A0)
 
 A free, fast and simple Python package to compute the position of the Sun, as well as its rise and set times.
 SolTrack was originally written in C/C++ by [Marc van der Sluys](http://han.vandersluys.nl/en/) of the
@@ -196,7 +196,7 @@ print()
 
 * Author: Marc van der Sluys
 * Contact: http://marc.vandersluys.nl
-* Licence: [GPLv3+](https://www.gnu.org/licenses/gpl.html)
+* Licence: [EUPL 1.2](https://www.eupl.eu/1.2/en/)
 
 
 ## References ##
