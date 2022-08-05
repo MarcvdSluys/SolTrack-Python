@@ -19,9 +19,8 @@
 
 from dataclasses import dataclass
 import numpy as np
+import pandas as pd
 import datetime as dt
-import pytz as tz
-import astrotool as at
 
 
 @dataclass
@@ -46,17 +45,20 @@ class Time:
         
         """
         
-        # If a Time object does not yet exist, create it:
-        # if(not hasattr(self, "time")):
-        #     self.time = Time()  # Create a SolTrack Time object
+        # Combine the date/time values into a single "2D" array with a single row and the original values as
+        # columns, and convert it to a Pandas df:
+        self.df = pd.DataFrame(np.vstack([year,month,day, hour,minute,second]).transpose(),
+                               columns=['year','month','day', 'hour','minute','second'])
         
-        self.year   = year
-        self.month  = month
-        self.day    = day
+        self.df = pd.DataFrame(data=pd.to_datetime(self.df), columns=['datetime'])  # Convert the date+time columns into a single datetime column
         
-        self.hour   = hour
-        self.minute = minute
-        self.second = second
+        self.year   = self.df.loc[:, 'datetime'].dt.year
+        self.month  = self.df.loc[:, 'datetime'].dt.month
+        self.day    = self.df.loc[:, 'datetime'].dt.day
+        
+        self.hour   = self.df.loc[:, 'datetime'].dt.hour
+        self.minute = self.df.loc[:, 'datetime'].dt.minute
+        self.second = self.df.loc[:, 'datetime'].dt.second + self.df.loc[:, 'datetime'].dt.microsecond/1e6
         
         return
     
@@ -73,28 +75,21 @@ class Time:
            Note:
              Use setDateAndTime() instead if you have year, month,day, hour, minute and second as separate
              variables.
-
+        
         """
         
-        if(type(dtObj) is np.datetime64):
-            utc = dtObj  # datetime64 does not support timezones, so assume timestamps are already in UTC
-            
-            self.year, self.month, self.day, self.hour, self.minute, self.second, us = at.ymdhms_us_from_datetime64(utc)
-            self.second += us/1e6  # Add microseconds to seconds
-            
-        else:
-            utc = dtObj.astimezone(tz.utc)  # Convert from local time to UTC
-            
-            self.year   = utc.year
-            self.month  = utc.month
-            self.day    = utc.day
-            
-            self.hour   = utc.hour
-            self.minute = utc.minute
-            self.second = utc.second + utc.microsecond/1e6
+        self.df = pd.DataFrame([dtObj], columns=['datetime'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+        
+        self.year   = self.df.loc[:, 'datetime'].dt.year
+        self.month  = self.df.loc[:, 'datetime'].dt.month
+        self.day    = self.df.loc[:, 'datetime'].dt.day
+        
+        self.hour   = self.df.loc[:, 'datetime'].dt.hour
+        self.minute = self.df.loc[:, 'datetime'].dt.minute
+        self.second = self.df.loc[:, 'datetime'].dt.second + self.df.loc[:, 'datetime'].dt.microsecond/1e6
         
         return
-    
+        
     
     def now(self):
         """Return the current system time as a SolTrack time object.
@@ -107,7 +102,7 @@ class Time:
         return
         
         
-    def _computeJulianDay(self, year, month, day,  hour, minute, second):
+    def _computeJulianDayScalar(self, year, month, day,  hour, minute, second):
         """Compute the Julian Day from the date and time.
         
         Parameters:
@@ -139,5 +134,50 @@ class Time:
         
         return
     
+    
+    
+    def _computeJulianDay(self, year,month,day, hour,minute,second, jd_start_greg=2299160.5):
+        """Compute the Julian Day from given year, month, day, hour, minute and second.
+        
+        Args:
+          year (int):             Year CE.  Note that year=0 = 1 BCE, year=-1 = 2 BCE, etc.
+          month (int):            Month number of year (1-12).
+          day (float):            Day of month with fraction (1.0-31.999...).
+        
+          hour (int):             Hour of day (0-23).
+          minute (int):           Minute of hour (0-59).
+          second (float):         Second of minute (0.0-59.999...).
+        
+          jd_start_greg (float):  JD of start of Gregorian calendar (optional; default=2299160.5 = 1582-10-15.0).
+        
+        Returns:
+          float:  jd: Julian day (days).
+          
+        Note:
+          - The JD will be in the same timezone as the date and time (UT for the offical JD).
+          - Decimals can be used in the day to take into account the time of day other than midnight, e.g. 1.5 for
+            noon on the first day of the month.
+        """
+        
+        # Copy and typecast input to numpy.ndarrays:
+        year  = np.asarray(np.copy(year))
+        month = np.asarray(np.copy(month))
+        day   = np.asarray(np.copy(day) + hour/24 + minute/1440 + second/86400)
+        
+        # Jan/Feb are month 13/14 of the previous year:
+        year[month  <= 2] -= 1
+        month[month <= 2] += 12
+        
+        # JD for Julian calendar (ensure it always is an array):
+        jd = np.asarray(np.floor(365.25*(year+4716)) + np.floor(30.6001*(month+1)) + day - 1524.5)
+        
+        # Apply correction for Gregorian calendar:
+        sel      = jd >= jd_start_greg                # Select cases for Greg.cal.
+        cent_1   = np.floor(year[sel]/100.0)          # Count: (century - 1)
+        jd[sel] += 2 - cent_1 + np.floor(cent_1/4.0)  # Offset Julian-Gregorian
+        
+        self.julianDay = jd
+        
+        return
     
     

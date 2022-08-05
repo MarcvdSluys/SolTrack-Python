@@ -212,7 +212,7 @@ class Position(Constants, Parameters):
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
-        self._altitudeUncorr = alt                                 # Sun altitude, uncorrected for refraction
+        self._altitudeUncorr = np.copy(alt)                        # Sun altitude, uncorrected for refraction.  If not copied, _altitudeUncorr and altitude will be converted to degrees TWICE!
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
