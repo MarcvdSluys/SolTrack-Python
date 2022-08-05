@@ -42,7 +42,6 @@ class Time:
         
            Note:
              Use setDateTime() instead if you have a Python datetime object.
-        
         """
         
         # Combine the date/time values into a single "2D" array with a single row and the original values as
@@ -50,15 +49,15 @@ class Time:
         self.df = pd.DataFrame(np.vstack([year,month,day, hour,minute,second]).transpose(),
                                columns=['year','month','day', 'hour','minute','second'])
         
-        self.df = pd.DataFrame(data=pd.to_datetime(self.df), columns=['datetime'])  # Convert the date+time columns into a single datetime column
+        self.df = pd.DataFrame(data=pd.to_datetime(self.df), columns=['UTC'])  # Convert the date+time columns into a single datetime column
         
-        self.year   = self.df.loc[:, 'datetime'].dt.year
-        self.month  = self.df.loc[:, 'datetime'].dt.month
-        self.day    = self.df.loc[:, 'datetime'].dt.day
+        self.year   = self.df.loc[:, 'UTC'].dt.year
+        self.month  = self.df.loc[:, 'UTC'].dt.month
+        self.day    = self.df.loc[:, 'UTC'].dt.day
         
-        self.hour   = self.df.loc[:, 'datetime'].dt.hour
-        self.minute = self.df.loc[:, 'datetime'].dt.minute
-        self.second = self.df.loc[:, 'datetime'].dt.second + self.df.loc[:, 'datetime'].dt.microsecond/1e6
+        self.hour   = self.df.loc[:, 'UTC'].dt.hour
+        self.minute = self.df.loc[:, 'UTC'].dt.minute
+        self.second = self.df.loc[:, 'UTC'].dt.second + self.df.loc[:, 'UTC'].dt.microsecond/1e6
         
         return
     
@@ -75,18 +74,24 @@ class Time:
            Note:
              Use setDateAndTime() instead if you have year, month,day, hour, minute and second as separate
              variables.
-        
         """
         
-        self.df = pd.DataFrame([dtObj], columns=['datetime'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+        if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
+            self.df = pd.DataFrame(np.asarray([dtObj]), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+        else:
+            self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
         
-        self.year   = self.df.loc[:, 'datetime'].dt.year
-        self.month  = self.df.loc[:, 'datetime'].dt.month
-        self.day    = self.df.loc[:, 'datetime'].dt.day
+        # Ensure timestamps are in UTC:
+        self.df['UTC'] = pd.to_datetime(self.df['LT'], utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
+        self.df['UTC'] = self.df['UTC'].dt.tz_convert(None)       # Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
         
-        self.hour   = self.df.loc[:, 'datetime'].dt.hour
-        self.minute = self.df.loc[:, 'datetime'].dt.minute
-        self.second = self.df.loc[:, 'datetime'].dt.second + self.df.loc[:, 'datetime'].dt.microsecond/1e6
+        self.year   = self.df.loc[:, 'UTC'].dt.year
+        self.month  = self.df.loc[:, 'UTC'].dt.month
+        self.day    = self.df.loc[:, 'UTC'].dt.day
+        
+        self.hour   = self.df.loc[:, 'UTC'].dt.hour
+        self.minute = self.df.loc[:, 'UTC'].dt.minute
+        self.second = self.df.loc[:, 'UTC'].dt.second + self.df.loc[:, 'UTC'].dt.microsecond/1e6
         
         return
         
