@@ -19,6 +19,7 @@
 
 from dataclasses import dataclass
 import numpy as np
+import pandas as pd
 
 from .data import Constants, Parameters
 
@@ -26,7 +27,7 @@ from .data import Constants, Parameters
 @dataclass
 class RiseSet(Constants, Parameters):
     """Class concerning the rise, transit and set times and positions of the Sun and related attributes and methods."""
-
+    
     
     def __init__(self):
         Parameters.__init__(self)
@@ -43,20 +44,65 @@ class RiseSet(Constants, Parameters):
         
     
     
-    def computeRiseSet(self, rsAlt=0.0):
+    def computeRiseSet(self, rsAlt=0.0, accur=1e-5):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
           rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
+          accur:             (float):     Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
         
         Note:
+          - rise/set/transit times are ALWAYS in UTC!
           - if rsAlt == 0.0, actual rise and set times are computed
           - if rsAlt != 0.0, the routine calculates when alt = rsAlt is reached
           - returns times, rise/set azimuth and transit altitude in the class riseSet
          
           See:
             - subroutine riset() in riset.f90 from libTheSky (libthesky.sf.net) for more info
+        """
         
+        trTime = np.empty(0);  riTime = np.empty(0);  seTime = np.empty(0)
+        trAlt  = np.empty(0);  riAz   = np.empty(0);  seAz   = np.empty(0)
+        
+        # CHECK: we should use local time for local Sun rise/transit/set, but what do we do if UTC is available only?
+        if 'LT' in self.df:
+            origDT = self.df['LT']
+        else:
+            origDT = self.df['UTC']  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
+        
+        for OrigDTi in origDT:  # Loop over dates in array
+            tmRad, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur)  # Compute r/s/t for a single date
+            
+            # Store intermediate results:
+            trTime = np.append(trTime, tmRad[0]*self._R2H)  # Transit time - radians -> hours
+            riTime = np.append(riTime, tmRad[1]*self._R2H)  # Rise time - radians -> hours
+            seTime = np.append(seTime, tmRad[2]*self._R2H)  # Set time - radians -> hours
+            
+            trAlt = np.append(trAlt, azalt[0])  # Transit altitude (rad)
+            riAz  = np.append(riAz,  azalt[1])  # Rise azimuth (rad)
+            seAz  = np.append(seAz,  azalt[2])  # Set azimuth (rad)
+        
+        
+        # Store final results:
+        self.transitTime      = trTime
+        self.riseTime         = riTime
+        self.setTime          = seTime
+        self.transitAltitude  = trAlt
+        self.riseAzimuth      = riAz
+        self.setAzimuth       = seAz
+        
+        return
+    
+    
+    def _computeRiseSetSingle(self, origDT, rsAlt, accur):
+        """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude for a single date.
+        
+        Parameters:
+          origDt          (datetime):     Original datetime of the date to compute the rise, set and transit for..
+          rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
+          accur:             (float):     Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
+        
+        See computeRiseSet() for more details.
         """
         
         rsa = -0.8333/self._R2D               # Standard altitude for the Sun in radians
@@ -65,6 +111,7 @@ class RiseSet(Constants, Parameters):
         tmRad = np.zeros(3)
         azalt = np.zeros(3)
         alt=0.0;  ha=0.0; h0=0.0
+        
         
         # We need a local SolTrack instance for the same location (but in radians!), but with different settings
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
@@ -77,7 +124,11 @@ class RiseSet(Constants, Parameters):
                                 computeRefrEquatorial=True, computeDistance=False)
         
         # Set date and time to midnight of the desired date:
-        st.setDateAndTime(self.year, self.month, self.day, 0,0,0.0)
+        midnight = pd.DataFrame(np.vstack([origDT.year, origDT.month, origDT.day]).transpose(),
+                                columns=['year','month','day'])
+        df = pd.DataFrame(data=pd.to_datetime(midnight), columns=['UTC'])  # Convert the date+time columns into a single datetime column
+        st.setDateTime(df['UTC'])
+        
         
         # Compute the Sun's position:
         st.computePosition()
@@ -94,15 +145,14 @@ class RiseSet(Constants, Parameters):
             evMax = 1              # Compute transit time and altitude only
         else:
             h0 = np.arccos(cosH0) % self._PI  # Should probably work without %
-            
+        
         
         tmRad[0] = (st._rightAscensionUncorr - st.geoLongitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
             tmRad[1] = (tmRad[0] - h0) % self._TWOPI   # Rise time in radians
             tmRad[2] = (tmRad[0] + h0) % self._TWOPI   # Set time in radians
-            
-            
-        accur = 1.0e-5            # Accuracy;  1e-5 rad ~ 0.14s. Don't make this smaller than 1e-16
+        
+        
         for evi in range(evMax):  # Loop over transit, rise, set
             iter = 0
             dTmRad = np.inf
@@ -131,7 +181,7 @@ class RiseSet(Constants, Parameters):
                 
                 iter += 1
                 if(iter > 30): break  # The while loop doesn't seem to converge
-            # while(abs(dTmRad) > accur)
+            # end while(abs(dTmRad) > accur)
             
             
             if(iter > 30):  # Convergence failed
@@ -150,7 +200,7 @@ class RiseSet(Constants, Parameters):
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
                 
-        # for-loop evi
+        # end for loop evi
         
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
@@ -164,18 +214,9 @@ class RiseSet(Constants, Parameters):
             azalt[0] *= self._R2D   # Transit altitude
             azalt[1] *= self._R2D   # Rise azimuth
             azalt[2] *= self._R2D   # Set azimuth
-            
-            
-        # Store results:
-        self.transitTime     = tmRad[0]*self._R2H  # Transit time - radians -> hours
-        self.riseTime        = tmRad[1]*self._R2H  # Rise time - radians -> hours
-        self.setTime         = tmRad[2]*self._R2H  # Set time - radians -> hours
         
-        self.transitAltitude = azalt[0]      # Transit altitude
-        self.riseAzimuth     = azalt[1]      # Rise azimuth
-        self.setAzimuth      = azalt[2]      # Set azimuth
         
-        return
+        return tmRad, azalt
     
     
     

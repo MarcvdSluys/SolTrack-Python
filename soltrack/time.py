@@ -102,6 +102,7 @@ class Time:
            Returns:
                Current system date and time in a SolTrack time object.
         """
+        
         self.setDateTime(dt.datetime.now())
         
         return
@@ -123,7 +124,6 @@ class Time:
         
         Note:
           - Gregorian calendar only (>~1582).
-        
         """
         
         if(month <= 2):  # Treat Jan, Feb as months 13, 14 of the previous year
