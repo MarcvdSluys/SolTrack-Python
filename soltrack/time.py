@@ -35,7 +35,7 @@ class Time:
              year   (int):    year of date.
              month  (int):    month of date.
              day    (int):    day of date.
-             
+        
              hour   (int):    hour of day  (default=0).
              minute (int):    minute of time  (default=0).
              second (float):  second of time  (default=0).
@@ -51,23 +51,24 @@ class Time:
         
         self.df = pd.DataFrame(data=pd.to_datetime(self.df), columns=['UTC'])  # Convert the date+time columns into a single datetime column
         
-        self.year   = self.df.loc[:, 'UTC'].dt.year
-        self.month  = self.df.loc[:, 'UTC'].dt.month
-        self.day    = self.df.loc[:, 'UTC'].dt.day
+        utc = self.df.loc[:, 'UTC']
+        self.year   = utc.dt.year
+        self.month  = utc.dt.month
+        self.day    = utc.dt.day
         
-        self.hour   = self.df.loc[:, 'UTC'].dt.hour
-        self.minute = self.df.loc[:, 'UTC'].dt.minute
-        self.second = self.df.loc[:, 'UTC'].dt.second + self.df.loc[:, 'UTC'].dt.microsecond/1e6
+        self.hour   = utc.dt.hour
+        self.minute = utc.dt.minute
+        self.second = utc.dt.second + utc.dt.microsecond/1e6
         
         return
     
     
-    def setDateTime(self, dtObj):
+    def setDateTime(self, dtObj, utc=False):
         """Set the SolTrack date and time using a (local) Python datetime object.
         
            Parameters:
                dtObj (datetime(64)):  Date and time in a Python datetime object (UTC if timezone naive).
-               
+        
            Returns:
                Time:  Date and time in a SolTrack time object.
         
@@ -76,25 +77,38 @@ class Time:
              variables.
         """
         
-        if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
-            self.df = pd.DataFrame(np.asarray([dtObj]), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+        if utc:  # ~29% faster if it is known that datetimes are UTC
+            if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
+                self.df = pd.DataFrame(np.asarray([dtObj]), columns=['UTC'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+            else:
+                # self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                self.df = pd.DataFrame(np.asarray(dtObj), columns=['UTC'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
         else:
-            self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+            if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
+                self.df = pd.DataFrame(np.asarray([dtObj]), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+            else:
+                # self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                
+            # Ensure timestamps are in UTC:
+            self.df['UTC'] = pd.to_datetime(self.df['LT'], utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
+            self.df['UTC'] = self.df['UTC'].dt.tz_convert(None)       # 8±2% faster if left out.  Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
+            
+        # print(self.df)
+        # exit(0)
         
-        # Ensure timestamps are in UTC:
-        self.df['UTC'] = pd.to_datetime(self.df['LT'], utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
-        self.df['UTC'] = self.df['UTC'].dt.tz_convert(None)       # Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
+        utc = self.df['UTC'].dt
         
-        self.year   = self.df.loc[:, 'UTC'].dt.year
-        self.month  = self.df.loc[:, 'UTC'].dt.month
-        self.day    = self.df.loc[:, 'UTC'].dt.day
+        self.year   = utc.year
+        self.month  = utc.month
+        self.day    = utc.day
         
-        self.hour   = self.df.loc[:, 'UTC'].dt.hour
-        self.minute = self.df.loc[:, 'UTC'].dt.minute
-        self.second = self.df.loc[:, 'UTC'].dt.second + self.df.loc[:, 'UTC'].dt.microsecond/1e6
+        self.hour   = utc.hour
+        self.minute = utc.minute
+        self.second = utc.second + utc.microsecond/1e6
         
         return
-        
+    
     
     def now(self):
         """Return the current system time as a SolTrack time object.
@@ -106,8 +120,8 @@ class Time:
         self.setDateTime(dt.datetime.now())
         
         return
-        
-        
+    
+    
     def _computeJulianDayScalar(self, year, month, day,  hour, minute, second):
         """Compute the Julian Day from the date and time.
         
@@ -157,7 +171,7 @@ class Time:
         
         Returns:
           float:  jd: Julian day (days).
-          
+        
         Note:
           - The JD will be in the same timezone as the date and time (UT for the offical JD).
           - Decimals can be used in the day to take into account the time of day other than midnight, e.g. 1.5 for
@@ -184,5 +198,4 @@ class Time:
         self.julianDay = jd
         
         return
-    
     

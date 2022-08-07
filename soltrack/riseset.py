@@ -123,7 +123,7 @@ class RiseSet(Constants, Parameters):
             st = self.__class__(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
                                 computeRefrEquatorial=True, computeDistance=False)
         
-        # Set date and time to midnight of the desired date:
+        # Set date and time to midnight of the desired date:  CHECK - use .dt.normalize()?
         midnight = pd.DataFrame(np.vstack([origDT.year, origDT.month, origDT.day]).transpose(),
                                 columns=['year','month','day'])
         df = pd.DataFrame(data=pd.to_datetime(midnight), columns=['UTC'])  # Convert the date+time columns into a single datetime column
