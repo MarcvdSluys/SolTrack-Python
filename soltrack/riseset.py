@@ -65,11 +65,12 @@ class RiseSet(Constants, Parameters):
         trAlt  = np.empty(0);  riAz   = np.empty(0);  seAz   = np.empty(0)
         
         # CHECK: we should use local time for local Sun rise/transit/set, but what do we do if UTC is available only?
-        if 'LT' in self.df:
-            origDT = self.df['LT']
+        if self.lt is not None:
+            origDT = self.lt
         else:
-            origDT = self.df['UTC']  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
+            origDT = self.utc  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
         
+            
         for OrigDTi in origDT:  # Loop over dates in array
             tmRad, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur)  # Compute r/s/t for a single date
             

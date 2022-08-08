@@ -32,7 +32,10 @@ class Position(Constants, Parameters):
         Parameters.__init__(self)
         
         # Time:
+        self.lt:                     float = None;     """The local date/time for the desired instant, if any"""
+        self.utc:                    float = 0.0;      """The universal date/time for the desired instant"""
         self.julianDay:              float = 0.0;      """The Julian day for the desired instant"""
+        
         self._tJD:                   float = 0.0;      """Time in Julian days since 2000.0"""
         self._tJC:                   float = 0.0;      """Time in Julian centuries since 2000.0"""
         self._tJC2:                  float = 0.0;      """Time in Julian centuries since 2000.0 squared"""

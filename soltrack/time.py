@@ -46,19 +46,21 @@ class Time:
         
         # Combine the date/time values into a single "2D" array with a single row and the original values as
         # columns, and convert it to a Pandas df:
-        self.df = pd.DataFrame(np.vstack([year,month,day, hour,minute,second]).transpose(),
-                               columns=['year','month','day', 'hour','minute','second'])
+        df = pd.DataFrame(np.vstack([year,month,day, hour,minute,second]).transpose(),
+                          columns=['year','month','day', 'hour','minute','second'])
         
-        self.df = pd.DataFrame(data=pd.to_datetime(self.df), columns=['UTC'])  # Convert the date+time columns into a single datetime column
+        df = pd.DataFrame(data=pd.to_datetime(df), columns=['UTC'])  # Convert the date+time columns into a single datetime column
         
-        utc = self.df.loc[:, 'UTC']
-        self.year   = utc.dt.year
-        self.month  = utc.dt.month
-        self.day    = utc.dt.day
+        self.utc = df.loc[:, 'UTC']
+        utc_dt = self.utc.dt
         
-        self.hour   = utc.dt.hour
-        self.minute = utc.dt.minute
-        self.second = utc.dt.second + utc.dt.microsecond/1e6
+        self.year   = utc_dt.year.to_numpy()
+        self.month  = utc_dt.month.to_numpy()
+        self.day    = utc_dt.day.to_numpy()
+        
+        self.hour   = utc_dt.hour.to_numpy()
+        self.minute = utc_dt.minute.to_numpy()
+        self.second = utc_dt.second.to_numpy() + utc_dt.microsecond.to_numpy()/1e6
         
         return
     
@@ -77,35 +79,30 @@ class Time:
              variables.
         """
         
-        if utc:  # ~29% faster if it is known that datetimes are UTC
+        if utc:  # up to ~29% faster if datetimes are known to be UTC.  Create DatetimeIndex with UTC times directly:
             if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
-                self.df = pd.DataFrame(np.asarray([dtObj]), columns=['UTC'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                self.utc = pd.to_datetime(np.asarray([dtObj]))  # DatetimeIndex
             else:
-                # self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
-                self.df = pd.DataFrame(np.asarray(dtObj), columns=['UTC'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
-        else:
+                self.utc = pd.to_datetime(np.asarray(dtObj))    # DatetimeIndex
+            
+        else:  # Create DatetimeIndex with local times, then convert to UTC:
             if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
-                self.df = pd.DataFrame(np.asarray([dtObj]), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                self.lt = pd.to_datetime(np.asarray([dtObj]))   # DatetimeIndex
             else:
-                # self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
-                self.df = pd.DataFrame(np.asarray(dtObj), columns=['LT'])  # DF containing Series containing pd._libs.tslibs.timestamps.Timestamp == datetime64[ns]
+                self.lt = pd.to_datetime(np.asarray(dtObj))     # DatetimeIndex
                 
             # Ensure timestamps are in UTC:
-            self.df['UTC'] = pd.to_datetime(self.df['LT'], utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
-            self.df['UTC'] = self.df['UTC'].dt.tz_convert(None)       # 8±2% faster if left out.  Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
+            self.utc = pd.to_datetime(self.lt, utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
+            self.utc = self.utc.tz_convert(None)          # 8±2% faster if left out.  Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
+        
             
-        # print(self.df)
-        # exit(0)
+        self.year   = self.utc.year.to_numpy()
+        self.month  = self.utc.month.to_numpy()
+        self.day    = self.utc.day.to_numpy()
         
-        utc = self.df['UTC'].dt
-        
-        self.year   = utc.year
-        self.month  = utc.month
-        self.day    = utc.day
-        
-        self.hour   = utc.hour
-        self.minute = utc.minute
-        self.second = utc.second + utc.microsecond/1e6
+        self.hour   = self.utc.hour.to_numpy()
+        self.minute = self.utc.minute.to_numpy()
+        self.second = self.utc.second.to_numpy() + self.utc.microsecond.to_numpy()/1e6
         
         return
     
