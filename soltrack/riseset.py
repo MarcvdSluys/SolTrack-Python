@@ -19,7 +19,6 @@
 
 from dataclasses import dataclass
 import numpy as np
-import pandas as pd
 
 from .data import Constants, Parameters
 
@@ -33,9 +32,9 @@ class RiseSet(Constants, Parameters):
         Parameters.__init__(self)
         
         # Rise, transit and set time:
-        self.riseTime:               float = 0.0;      """Rise time of the Sun (hours UT)"""
-        self.transitTime:            float = 0.0;      """Transit time of the Sun (hours UT)"""
-        self.setTime:                float = 0.0;      """Set time of the Sun (hours UT)"""
+        self.riseTime:               float = 0.0;      """Rise time of the Sun (hours LT or UTC)"""
+        self.transitTime:            float = 0.0;      """Transit time of the Sun (hours LT or UTC)"""
+        self.setTime:                float = 0.0;      """Set time of the Sun (hours LT or UTC)"""
         
         # Rise, transit and set position:
         self.riseAzimuth:            float = 0.0;      """Rise azimuth of the Sun (radians)"""
@@ -52,7 +51,7 @@ class RiseSet(Constants, Parameters):
           accur:             (float):     Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
         
         Note:
-          - rise/set/transit times are ALWAYS in UTC!
+          - rise/set/transit times are in the LOCAL timezone used for the input (hence UTC if UTC was used).
           - if rsAlt == 0.0, actual rise and set times are computed
           - if rsAlt != 0.0, the routine calculates when alt = rsAlt is reached
           - returns times, rise/set azimuth and transit altitude in the class riseSet
@@ -124,12 +123,9 @@ class RiseSet(Constants, Parameters):
             st = self.__class__(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
                                 computeRefrEquatorial=True, computeDistance=False)
         
-        # Set date and time to midnight of the desired date:  CHECK - use .dt.normalize()?
-        midnight = pd.DataFrame(np.vstack([origDT.year, origDT.month, origDT.day]).transpose(),
-                                columns=['year','month','day'])
-        df = pd.DataFrame(data=pd.to_datetime(midnight), columns=['UTC'])  # Convert the date+time columns into a single datetime column
-        st.setDateTime(df['UTC'])
-        
+        # Set date and time to midnight of the desired date:
+        midnight = origDT.normalize()  # Midnight for the date in OrigDT, keeping the timezone
+        st.setDateTime(midnight)
         
         # Compute the Sun's position:
         st.computePosition()

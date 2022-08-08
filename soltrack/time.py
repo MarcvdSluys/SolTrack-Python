@@ -25,7 +25,7 @@ import datetime as dt
 
 @dataclass
 class Time:
-    """Class containing the date and time (in UT) to compute the Sun position for."""
+    """Class containing the date and time (in UTC) to compute the Sun position for."""
     
     
     def setDateAndTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
@@ -170,7 +170,7 @@ class Time:
           float:  jd: Julian day (days).
         
         Note:
-          - The JD will be in the same timezone as the date and time (UT for the offical JD).
+          - The JD will be in the same timezone as the date and time (UTC for the offical JD).
           - Decimals can be used in the day to take into account the time of day other than midnight, e.g. 1.5 for
             noon on the first day of the month.
         """
