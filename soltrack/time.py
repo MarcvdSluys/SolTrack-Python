@@ -95,7 +95,11 @@ class Time:
             self.utc = pd.to_datetime(self.lt, utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).
             self.utc = self.utc.tz_convert(None)          # 8±2% faster if left out.  Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
         
-            
+        
+        # Note: the six lines below increase the cpu time of a computePosition() by a factor of 2.7!  The
+        # .to_numpy() method parts have a negligable contribution to that.
+        # CHECK1: using .utc.to_julian_date() would not require self.year-second here, but is slightly slower
+        # and gives wrong results in computeRiseSet().  See CHECK1 in those places.
         self.year   = self.utc.year.to_numpy()
         self.month  = self.utc.month.to_numpy()
         self.day    = self.utc.day.to_numpy()

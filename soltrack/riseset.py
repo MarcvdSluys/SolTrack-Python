@@ -158,6 +158,13 @@ class RiseSet(Constants, Parameters):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]   # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*self._R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
+                
+                # CHECK1: Replacing the line above with the one below, and using utc.to_julian_date() in
+                # computePosition() and removal of self.year-second in setDateTime() is more elegant, but
+                # slightly slower.  See CHECK1 in thise places.  HOWEVER, this also gives different results
+                # for the rise/set times...(?)
+                # st.utc = st.utc.normalize() + dt.timedelta(hours=tmRad[evi]*self._R2H)
+                
                 st.computePosition()
                 
                 ha  = self._revPI(th0 + st.geoLongitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI

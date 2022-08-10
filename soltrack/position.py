@@ -83,6 +83,11 @@ class Position(Constants, Parameters):
         # Compute the Julian Day from the date and time:
         self._computeJulianDay(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
+        # CHECK1: the line below instead of above alone makes the whole computePosition() call ~36% slower!
+        # However, combining this with the removal of self.year-self.second in setDateTime() is only slightly
+        # slower, but causes problems in computeRiseSet().  See CHECK1 in those places.
+        # self.julianDay = self.utc.to_julian_date().to_numpy()
+        
         # Derived expressions for time, to be reused:
         self._tJD  = self.julianDay - 2451545.0     # Time in Julian days since 2000.0
         self._tJC  = self._tJD/36525.0              # Time in Julian centuries since 2000.0
