@@ -71,12 +71,12 @@ class RiseSet(Constants, Parameters):
         
             
         for OrigDTi in origDT:  # Loop over dates in array
-            tmRad, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur)  # Compute r/s/t for a single date
+            tmHrs, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur)  # Compute r/s/t for a single date
             
             # Store intermediate results:
-            trTime = np.append(trTime, tmRad[0]*self._R2H)  # Transit time - radians -> hours
-            riTime = np.append(riTime, tmRad[1]*self._R2H)  # Rise time - radians -> hours
-            seTime = np.append(seTime, tmRad[2]*self._R2H)  # Set time - radians -> hours
+            trTime = np.append(trTime, tmHrs[0])  # Transit time - hours
+            riTime = np.append(riTime, tmHrs[1])  # Rise time - hours
+            seTime = np.append(seTime, tmHrs[2])  # Set time - hours
             
             trAlt = np.append(trAlt, azalt[0])  # Transit altitude (rad)
             riAz  = np.append(riAz,  azalt[1])  # Rise azimuth (rad)
@@ -206,6 +206,8 @@ class RiseSet(Constants, Parameters):
                 
         # end for loop evi
         
+        # Convert times from radians to hours:
+        tmHrs = tmRad*self._R2H
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
         if(self.param._useNorthEqualsZero):
@@ -219,8 +221,5 @@ class RiseSet(Constants, Parameters):
             azalt[1] *= self._R2D   # Rise azimuth
             azalt[2] *= self._R2D   # Set azimuth
         
-        
-        return tmRad, azalt
-    
-    
+        return tmHrs, azalt
     
