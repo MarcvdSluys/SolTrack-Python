@@ -21,6 +21,8 @@ from dataclasses import dataclass
 import numpy as np
 
 from .data import Constants, Parameters
+import pandas as pd
+import astrotool as at
 
 
 @dataclass
@@ -43,12 +45,13 @@ class RiseSet(Constants, Parameters):
         
     
     
-    def computeRiseSet(self, rsAlt=0.0, accur=1e-5):
+    def computeRiseSet(self, rsAlt=0.0, accur=1e-5, return_datetimes=True):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
-          rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
-          accur:             (float):     Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
+          rsAlt            (float):  Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
+          accur:           (float):  Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
+          return_datetimes (bool):   Return times as datetimes rather than decimal hours.  Defaults to True.
         
         Note:
           - rise/set/transit times are in the LOCAL timezone used for the input (hence UTC if UTC was used).
@@ -71,7 +74,11 @@ class RiseSet(Constants, Parameters):
         
             
         for OrigDTi in origDT:  # Loop over dates in array
-            tmHrs, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur)  # Compute r/s/t for a single date
+            tmHrs, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur, return_datetimes)  # Compute r/s/t for a single date
+            
+            # Returned datetimes are timezone naive.  Add the timezone of the original date, if any:
+            if return_datetimes:
+                tmHrs = tmHrs.dt.tz_localize(OrigDTi.tz)
             
             # Store intermediate results:
             trTime = np.append(trTime, tmHrs[0])  # Transit time - hours
@@ -94,13 +101,14 @@ class RiseSet(Constants, Parameters):
         return
     
     
-    def _computeRiseSetSingle(self, origDT, rsAlt, accur):
+    def _computeRiseSetSingle(self, origDT, rsAlt, accur, return_datetimes):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude for a single date.
         
         Parameters:
-          origDt          (datetime):     Original datetime of the date to compute the rise, set and transit for..
-          rsAlt              (float):     Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
-          accur:             (float):     Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
+          origDt          (datetime):  Original datetime of the date to compute the rise, set and transit for..
+          rsAlt              (float):  Altitude to return rise/set data for (radians).  Set rsAlt>pi/2 to compute transit only.
+          accur:             (float):  Accuracy (rad).  Don't make this smaller than 1e-16.
+          return_datetimes    (bool):  Return times as datetimes rather than decimal hours.
         
         See computeRiseSet() for more details.
         """
@@ -206,6 +214,7 @@ class RiseSet(Constants, Parameters):
                 
         # end for loop evi
         
+        
         # Convert times from radians to hours:
         tmHrs = tmRad*self._R2H
         
@@ -214,12 +223,26 @@ class RiseSet(Constants, Parameters):
             azalt[1] = (azalt[1] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
             azalt[2] = (azalt[2] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
         
-        
         # Convert resulting angles to degrees if desired (use the original parameters!):
         if(self.param._useDegrees):
             azalt[0] *= self._R2D   # Transit altitude
             azalt[1] *= self._R2D   # Rise azimuth
             azalt[2] *= self._R2D   # Set azimuth
+        
+        if return_datetimes:  # Return datetimes iso time in hours:
+            # tmHrs now contains [transit, rise, set] times in the local timezone.  Convert to datetime Series.
+            jds = at.jd_from_date(midnight.year, midnight.month, midnight.day) + tmHrs/24
+            tmDTs = at.date_time_from_jd(jds)  # Array of 6 arrays containing N x year, N x month, NxD, NxHour,NxMin,NxSec.
+            
+            # Combine the six date/time values into a single "2D" array with a single row and the original values as
+            # columns, and convert it to a Pandas df:
+            df = pd.DataFrame(np.vstack(tmDTs).transpose(),
+                              columns=['year','month','day', 'hour','minute','second'])
+            
+            # Convert the date+time columns into a Pandas Series containing datetimes and round off to nearest second.
+            tmDTI = pd.to_datetime(df).dt.round('S')
+            
+            return tmDTI, azalt
         
         return tmHrs, azalt
     
