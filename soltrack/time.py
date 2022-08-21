@@ -110,7 +110,7 @@ class Time:
             self.utc = self.utc.tz_convert(None)          # 8±2% faster if left out.  Convert to UTC tz naive (i.e. convert to UTC and remove tz info)
         
         
-        # Note: the six lines below increase the cpu time of a computePosition() by a factor of 2.7!  The
+        # Note: the six lines below increase the cpu time of a compute_position() by a factor of 2.7!  The
         # .to_numpy() method parts have a negligable contribution to that.
         # CHECK1: using .utc.to_julian_date() would not require self.year-second here, but is slightly slower
         # and gives wrong results in computeRiseSet().  See CHECK1 in those places.

@@ -66,6 +66,13 @@ class Position(Constants, Parameters):
     
     
     def computePosition(self):
+        """This function is obsolescent and will be removed in a future version.  Use compute_position()
+        instead."""
+        _warn_obsolescent('computePosition', 'compute_position', rename=True)
+        return self.compute_position()
+    
+    
+    def compute_position(self):
         """ Method to compute the position of the Sun.
         """
         
@@ -84,7 +91,7 @@ class Position(Constants, Parameters):
         # Compute the Julian Day from the date and time:
         self.julianDay = at.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
-        # CHECK1: the line below instead of above alone makes the whole computePosition() call ~36% slower!
+        # CHECK1: the line below instead of above alone makes the whole compute_position() call ~36% slower!
         # However, combining this with the removal of self.year-self.second in set_date_time() is only slightly
         # slower, but causes problems in computeRiseSet().  See CHECK1 in those places.
         # self.julianDay = self.utc.to_julian_date().to_numpy()
@@ -351,3 +358,18 @@ class Position(Constants, Parameters):
         
         return ((angle + self._PI) % self._TWOPI) - self._PI
     
+    
+    
+def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolescent and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+    import sys
+    sys.stderr.write('\nWarning: the SolTrack function '+old_name+'() is obsolescent and will be removed in a future version.')
+    sys.stderr.write('  Use '+new_name+'() instead.')
+    if rename:
+        if extra:
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+        else:
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+    else:
+        sys.stderr.write('  Please see the documentation for details.\n\n')
+    return
