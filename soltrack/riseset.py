@@ -240,9 +240,18 @@ class RiseSet(Constants, Parameters):
                               columns=['year','month','day', 'hour','minute','second'])
             
             # Convert the date+time columns into a Pandas Series containing datetimes and round off to nearest second.
-            tmDTI = pd.to_datetime(df).dt.round('S')
+            tmDTI = pd.Series.copy(pd.to_datetime(df).dt.round('S'))  # Without .copy(), None below throws an error
             
+            if evMax == 1:  # No rise or set, transit only
+                tmDTI[1:3] = None
+                azalt[1:3] = None
+                
             return tmDTI, azalt
         
+        
+        if evMax == 1:  # No rise or set, transit only
+            tmHrs[1:3] = None
+            azalt[1:3] = None
+            
         return tmHrs, azalt
     
