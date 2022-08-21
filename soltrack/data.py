@@ -64,9 +64,9 @@ def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
     sys.stderr.write('  Use '+new_name+'() instead.')
     if rename:
         if extra:
-            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but some dummy variables and class members have also be renamed, so please see the documentation  in case a simple rename does not work and for new features.\n\n')
         else:
-            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names may suffice, but some dummy variables and class members have also be renamed, so please see the documentation in case a simple rename does not work.\n\n')
     else:
         sys.stderr.write('  Please see the documentation for details.\n\n')
     return
