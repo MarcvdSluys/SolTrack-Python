@@ -254,4 +254,3 @@ class RiseSet(Constants, Parameters):
             azalt[1:3] = None
             
         return tmHrs, azalt
-    
