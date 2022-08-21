@@ -32,6 +32,13 @@ class Location:
     
     
     def setLocation(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
+        """This function is obsolescent and will be removed in a future version.  Use set_location()
+        instead."""
+        _warn_obsolescent('setLocation', 'set_location', rename=True)
+        return self.set_location(geoLongitude, geoLatitude, pressure, temperature)
+    
+    
+    def set_location(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
         """Setter for the details of the observer/site location to compute the Sun position for.
         
         Parameters:
@@ -50,3 +57,19 @@ class Location:
         self.temperature  = temperature
         
         return
+
+
+def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolescent and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+    import sys
+    sys.stderr.write('\nWarning: the SolTrack function '+old_name+'() is obsolescent and will be removed in a future version.')
+    sys.stderr.write('  Use '+new_name+'() instead.')
+    if rename:
+        if extra:
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+        else:
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+    else:
+        sys.stderr.write('  Please see the documentation for details.\n\n')
+    return
+    
