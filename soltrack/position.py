@@ -54,10 +54,10 @@ class Position(Parameters):
         # Equatorial coordinates and sidereal time:
         self._right_ascension_uncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
         self._declination_uncorr:      float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declination:              float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
+        self.declination:              float = None;     """Declination of the Sun, corrected for refraction (radians)"""
         
         self._agst:                    float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
-        self.hour_angle:               float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        self.hour_angle:               float = None;     """Hour angle of the Sun, corrected for refraction (radians)"""
         
         # Horizontal coordinates:
         self._altitude_uncorr:         float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
@@ -156,7 +156,7 @@ class Position(Parameters):
         # Nutation, aberration:
         omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2      # Lon. of Moon's mean ascending node
         dpsi = -8.338601e-5*np.sin(omg)                                                  # Nutation in longitude
-        dist = 1.0000010178                                                              # Mean distance to the Sun in AU
+        dist = np.ones_like(l0)*1.0000010178                                             # Mean distance to the Sun in AU
         if(compute_distance):
             ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2  # Eccentricity of the Earth's orbit
             nu = ma + sec                                                                # True anomaly
@@ -371,6 +371,8 @@ class Position(Parameters):
           eq      (bool):  Include equatorial coordinates, defaults to False.
           uncorr  (bool):  Include coordinates uncorrected for refraction, defaults to False.
           rts_pos (bool):  Include the rise, transit and set positions, defaults to False.
+        
+        Note that if a desired variable is not available, the request will be silently ignored.
         """
         
         # Add date and time:
@@ -399,7 +401,7 @@ class Position(Parameters):
         self.df['altitude'] = self.altitude
         
         # Add equatorial coordinates:
-        if eq:
+        if eq and self.hour_angle is not None:
             self.df['hourAngle'] = self.hour_angle
             self.df['declination'] = self.declination
         
