@@ -62,7 +62,7 @@ class SolTrack(Location, Time, Position, RiseSet):
         # Create Constants and Parameters objects:
         self.cst       = Constants()
         self.param     = Parameters()
-        self.param.setParameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
+        self.param.set_parameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
         
         # Use composition to obtain the attributes from Location, Time, Position and RiseSet:
         Location.__init__(self, geoLongitude, geoLatitude)  # Set the geographic location

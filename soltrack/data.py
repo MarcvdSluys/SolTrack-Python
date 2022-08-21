@@ -44,6 +44,14 @@ class Parameters:
     
     def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
                       computeDistance=None):
+        """This function is obsolescent and will be removed in a future version.  Use set_parameters()
+        instead."""
+        _warn_obsolescent('setParameters', 'set_parameters', rename=True)
+        return self.set_parameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
+    
+        
+    def set_parameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
+                       computeDistance=None):
         """Set the SolTrack parameters (settings).
         
         Parameters:
@@ -59,3 +67,18 @@ class Parameters:
         if(computeDistance is not None):        self._computeDistance        = computeDistance
         
         return
+    
+    
+def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolescent and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+    import sys
+    sys.stderr.write('\nWarning: the SolTrack function '+old_name+'() is obsolescent and will be removed in a future version.')
+    sys.stderr.write('  Use '+new_name+'() instead.')
+    if rename:
+        if extra:
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+        else:
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+    else:
+        sys.stderr.write('  Please see the documentation for details.\n\n')
+    return
