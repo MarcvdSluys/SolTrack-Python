@@ -29,9 +29,9 @@ class Time:
     
     
     def setDateAndTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
-        """This function is obsolescent and will be removed in a future version use set_date_and_time()
+        """This function is obsolescent and will be removed in a future version.  Use set_date_and_time()
         instead."""
-        _warn_obsolesent('setDateAndTime', 'set_date_and_time', rename=True)
+        _warn_obsolescent('setDateAndTime', 'set_date_and_time', rename=True)
         return self.set_date_and_time(year,month,day, hour,minute,second)
     
     
@@ -73,9 +73,9 @@ class Time:
     
     
     def setDateTime(self, dtObj, utc=False):
-        """This function is obsolescent and will be removed in a future version use setDateTime()
+        """This function is obsolescent and will be removed in a future version.  Use setDateTime()
         instead."""
-        _warn_obsolesent('setDateTime', 'set_date_time', rename=True)
+        _warn_obsolescent('setDateTime', 'set_date_time', rename=True)
         return self.set_date_time(dtObj, utc)
     
     
@@ -137,10 +137,10 @@ class Time:
         return
     
     
-def _warn_obsolesent(old_name, new_name, rename=False, extra=False):
-    """Warn that a function is obsolete and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolescent and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
     import sys
-    sys.stderr.write('\nWarning: the AstroTool function '+old_name+'() is obsolesent and will be removed in a future version.')
+    sys.stderr.write('\nWarning: the SolTrack function '+old_name+'() is obsolescent and will be removed in a future version.')
     sys.stderr.write('  Use '+new_name+'() instead.')
     if rename:
         if extra:

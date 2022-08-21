@@ -46,6 +46,13 @@ class RiseSet(Constants, Parameters):
     
     
     def computeRiseSet(self, rsAlt=0.0, accur=1e-5, return_datetimes=True):
+        """This function is obsolescent and will be removed in a future version.  Use compute_rise_set()
+        instead."""
+        _warn_obsolescent('computeRiseSet', 'compute_rise_set', rename=True)
+        return self.compute_rise_set(rsAlt, accur, return_datetimes)
+    
+    
+    def compute_rise_set(self, rsAlt=0.0, accur=1e-5, return_datetimes=True):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
@@ -74,7 +81,7 @@ class RiseSet(Constants, Parameters):
         
             
         for OrigDTi in origDT:  # Loop over dates in array
-            tmHrs, azalt = self._computeRiseSetSingle(OrigDTi, rsAlt, accur, return_datetimes)  # Compute r/s/t for a single date
+            tmHrs, azalt = self._compute_rise_set_single(OrigDTi, rsAlt, accur, return_datetimes)  # Compute r/s/t for a single date
             
             # Returned datetimes are timezone naive.  Add the timezone of the original date, if any:
             if return_datetimes:
@@ -102,6 +109,13 @@ class RiseSet(Constants, Parameters):
     
     
     def _computeRiseSetSingle(self, origDT, rsAlt, accur, return_datetimes):
+        """This function is obsolescent and will be removed in a future version.  Use compute_rise_set()
+        instead."""
+        _warn_obsolescent('_computeRiseSetSingle', '_compute_rise_set_single', rename=True)
+        return self._compute_rise_set_single(origDT, rsAlt, accur, return_datetimes)
+    
+        
+    def _compute_rise_set_single(self, origDT, rsAlt, accur, return_datetimes):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude for a single date.
         
         Parameters:
@@ -254,3 +268,18 @@ class RiseSet(Constants, Parameters):
             azalt[1:3] = None
             
         return tmHrs, azalt
+    
+    
+def _warn_obsolescent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolescent and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+    import sys
+    sys.stderr.write('\nWarning: the SolTrack function '+old_name+'() is obsolescent and will be removed in a future version.')
+    sys.stderr.write('  Use '+new_name+'() instead.')
+    if rename:
+        if extra:
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+        else:
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+    else:
+        sys.stderr.write('  Please see the documentation for details.\n\n')
+    return
