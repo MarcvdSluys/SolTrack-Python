@@ -19,6 +19,7 @@
 
 from dataclasses import dataclass
 import numpy as np
+import pandas as pd
 from astroconst import r2d as _R2D, pi as _PI, pi2 as _TWOPI
 
 from .data import Parameters
@@ -359,6 +360,62 @@ class Position(Parameters):
         
         return ((angle + _PI) % _TWOPI) - _PI
     
+    
+    def create_df(self, utc=False, jd=False, ecl=False, eq=False, uncorr=False, rts_pos=False):
+        """Create a Pandas DataFrame with the results of the Sun position and rise/set data.
+
+        Parameters:
+          utc     (bool):  Include utc, defaults to False.
+          jd      (bool):  Include Julian day, defaults to False.
+          ecl     (bool):  Include ecliptical coordinates, defaults to False.
+          eq      (bool):  Include equatorial coordinates, defaults to False.
+          uncorr  (bool):  Include coordinates uncorrected for refraction, defaults to False.
+          rts_pos (bool):  Include the rise, transit and set positions, defaults to False.
+        """
+        
+        # Add date and time:
+        if self.lt is not None:
+            self.df = pd.DataFrame(data=self.lt, columns=['LT'])
+            if utc: self.df['UTC'] = self.utc
+        else:
+            self.df = pd.DataFrame(data=self.utc, columns=['UTC'])  # New df with initial column 0-90 (91 ints)
+        if jd: self.df['julianDay'] = self.julian_day
+        
+        # Add ecliptical coordinates:
+        if ecl:
+            self.df['longitude'] = self.longitude
+            self.df['latitude']  = 0
+        self.df['distance'] = self.distance
+        
+        # Add uncorrected coordinates:
+        if uncorr:
+            if eq:
+                self.df['raUncorr']   = self._right_ascension_uncorr
+                self.df['declUncorr'] = self._declination_uncorr
+            self.df['altUncorr'] = self._altitude_uncorr
+        
+        # Add horizontal coordinates:
+        self.df['azimuth']  = self.azimuth
+        self.df['altitude'] = self.altitude
+        
+        # Add equatorial coordinates:
+        if eq:
+            self.df['hourAngle'] = self.hour_angle
+            self.df['declination'] = self.declination
+        
+        # Add rise, transit and set data if available:
+        if self.transit_time is not None:
+            self.df['riseTime']  = self.rise_time
+            self.df['transTime'] = self.transit_time
+            self.df['setTime']   = self.set_time
+            
+            # Add rise, transit and set positions if desired:
+            if rts_pos:
+                self.df['riseAzimuth']   = self.rise_azimuth
+                self.df['transAltitude'] = self.transit_altitude
+                self.df['setAzimuth']    = self.set_azimuth
+        
+        return
     
     
 def _warn_obsolescent(old_name, new_name, rename=False, extra=False):

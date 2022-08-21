@@ -35,14 +35,14 @@ class RiseSet(Parameters):
         Parameters.__init__(self)
         
         # Rise, transit and set time:
-        self.rise_time:               float = 0.0;      """Rise time of the Sun (hours LT or UTC)"""
-        self.transit_time:            float = 0.0;      """Transit time of the Sun (hours LT or UTC)"""
-        self.set_time:                float = 0.0;      """Set time of the Sun (hours LT or UTC)"""
+        self.rise_time:               float = None;     """Rise time of the Sun (hours LT or UTC)"""
+        self.transit_time:            float = None;     """Transit time of the Sun (hours LT or UTC)"""
+        self.set_time:                float = None;     """Set time of the Sun (hours LT or UTC)"""
         
         # Rise, transit and set position:
-        self.rise_azimuth:            float = 0.0;      """Rise azimuth of the Sun (radians)"""
-        self.transit_altitude:        float = 0.0;      """Transit altitude of the Sun (radians)"""
-        self.set_azimuth:             float = 0.0;      """Set azimuth of the Sun (radians)"""
+        self.rise_azimuth:            float = None;     """Rise azimuth of the Sun (radians)"""
+        self.transit_altitude:        float = None;     """Transit altitude of the Sun (radians)"""
+        self.set_azimuth:             float = None;     """Set azimuth of the Sun (radians)"""
         
     
     
