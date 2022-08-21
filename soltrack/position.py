@@ -20,11 +20,13 @@
 from dataclasses import dataclass
 import numpy as np
 
-from .data import Constants, Parameters
+from .data import Parameters
+
+from astroconst import r2d as _R2D, pi as _PI, pi2 as _TWOPI
 
 
 @dataclass
-class Position(Constants, Parameters):
+class Position(Parameters):
     """Class containing the position of the Sun and related attributes and methods."""
 
     
@@ -80,8 +82,8 @@ class Position(Constants, Parameters):
         
         # If the user uses degrees, convert the geographic location to radians:
         if(self.param._use_degrees):
-            self.geo_longitude /= self._R2D
-            self.geo_latitude  /= self._R2D
+            self.geo_longitude /= _R2D
+            self.geo_latitude  /= _R2D
         
         # Compute these once and reuse:
         self._sin_lat = np.sin(self.geo_latitude)
@@ -123,9 +125,9 @@ class Position(Constants, Parameters):
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._use_degrees):
-            self.geo_longitude *= self._R2D    # Convert back to original
-            self.geo_latitude  *= self._R2D    # Convert back to original
-            self._convert_radians_to_degrees()    # Convert final results
+            self.geo_longitude *= _R2D          # Convert back to original
+            self.geo_latitude  *= _R2D          # Convert back to original
+            self._convert_radians_to_degrees()  # Convert final results
         
         return
     
@@ -167,7 +169,7 @@ class Position(Constants, Parameters):
         deps = 4.4615e-5*np.cos(omg)                                                     # Nutation in obliquity
         
         # Save position parameters:
-        self.longitude = (odot + aber + dpsi) % self._TWOPI                              # Apparent geocentric longitude, referred to the true equinox of date
+        self.longitude = (odot + aber + dpsi) % _TWOPI                                   # Apparent geocentric longitude, referred to the true equinox of date
         
         self.distance = dist                                                             # Distance (AU)
         
@@ -200,7 +202,7 @@ class Position(Constants, Parameters):
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self._right_ascension_uncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
+        self._right_ascension_uncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % _TWOPI  # 0 <= azimuth < 2pi
         self._declination_uncorr     = np.arcsin(sinObl*sinLon)
         
         return
@@ -314,10 +316,10 @@ class Position(Constants, Parameters):
         
         """
         
-        self.azimuth = (azimuth + self._PI) % self._TWOPI                    # Add PI to set North=0
+        self.azimuth = (azimuth + _PI) % _TWOPI                    # Add PI to set North=0
         
         if(self.param._compute_refr_equatorial):
-            self.hour_angle = (hour_angle + self._PI) % self._TWOPI          # Add PI to set North=0
+            self.hour_angle = (hour_angle + _PI) % _TWOPI          # Add PI to set North=0
             
         return
     
@@ -330,17 +332,17 @@ class Position(Constants, Parameters):
         
         """
         
-        self.longitude *= self._R2D
-        self._right_ascension_uncorr *= self._R2D
-        self._declination_uncorr *= self._R2D
+        self.longitude *= _R2D
+        self._right_ascension_uncorr *= _R2D
+        self._declination_uncorr *= _R2D
         
-        self._altitude_uncorr *= self._R2D
-        self.azimuth *= self._R2D
-        self.altitude *= self._R2D
+        self._altitude_uncorr *= _R2D
+        self.azimuth *= _R2D
+        self.altitude *= _R2D
         
         if(self.param._compute_refr_equatorial):
-            self.hour_angle *= self._R2D
-            self.declination *= self._R2D
+            self.hour_angle *= _R2D
+            self.declination *= _R2D
             
         return
     
@@ -356,7 +358,7 @@ class Position(Constants, Parameters):
         
         """
         
-        return ((angle + self._PI) % self._TWOPI) - self._PI
+        return ((angle + _PI) % _TWOPI) - _PI
     
     
     

@@ -30,7 +30,7 @@ name = 'soltrack'
 
 from dataclasses import dataclass
 
-from .data      import Constants, Parameters
+from .data      import Parameters
 from .location  import Location
 from .time      import Time
 from .position  import Position
@@ -58,8 +58,7 @@ class SolTrack(Location, Time, Position, RiseSet):
           The SolTrack class is a composition of the Location, Time, Position and RiseSet classes.
         """
         
-        # Create Constants and Parameters objects:
-        self.cst       = Constants()
+        # Create Parameters objects:
         self.param     = Parameters()
         self.param.set_parameters(use_degrees, use_north_equals_zero, compute_refr_equatorial, compute_distance)
         

@@ -20,13 +20,14 @@
 from dataclasses import dataclass
 import numpy as np
 
-from .data import Constants, Parameters
+from .data import Parameters
 import pandas as pd
 import astrotool as at
+from astroconst import r2d as _R2D, pi as _PI, pi2 as _TWOPI, r2h as _R2H
 
 
 @dataclass
-class RiseSet(Constants, Parameters):
+class RiseSet(Parameters):
     """Class concerning the rise, transit and set times and positions of the Sun and related attributes and methods."""
     
     
@@ -127,7 +128,7 @@ class RiseSet(Constants, Parameters):
         See computeRiseSet() for more details.
         """
         
-        rsa = -0.8333/self._R2D                # Standard altitude for the Sun in radians
+        rsa = -0.8333/_R2D                     # Standard altitude for the Sun in radians
         if(abs(rs_alt) > 1.e-9): rsa = rs_alt  # Use a user-specified altitude
         
         tmRad = np.zeros(3)
@@ -139,7 +140,7 @@ class RiseSet(Constants, Parameters):
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
         if(self.param._use_degrees):
-            st = self.__class__(self.geo_longitude/self._R2D, self.geo_latitude/self._R2D, use_degrees=False,
+            st = self.__class__(self.geo_longitude/_R2D, self.geo_latitude/_R2D, use_degrees=False,
                                 use_north_equals_zero=False, compute_refr_equatorial=True, compute_distance=False)
         else:
             st = self.__class__(self.geo_longitude, self.geo_latitude, use_degrees=False, use_north_equals_zero=False,
@@ -163,13 +164,13 @@ class RiseSet(Constants, Parameters):
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
         else:
-            h0 = np.arccos(cosH0) % self._PI  # Should probably work without %
+            h0 = np.arccos(cosH0) % _PI  # Should probably work without %
         
         
-        tmRad[0] = (st._right_ascension_uncorr - st.geo_longitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (st._right_ascension_uncorr - st.geo_longitude - st._agst) % _TWOPI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
-            tmRad[1] = (tmRad[0] - h0) % self._TWOPI   # Rise time in radians
-            tmRad[2] = (tmRad[0] + h0) % self._TWOPI   # Set time in radians
+            tmRad[1] = (tmRad[0] - h0) % _TWOPI   # Rise time in radians
+            tmRad[2] = (tmRad[0] + h0) % _TWOPI   # Set time in radians
         
         
         for evi in range(evMax):  # Loop over transit, rise, set
@@ -179,13 +180,13 @@ class RiseSet(Constants, Parameters):
             while(abs(dTmRad) > accur):
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
                 
-                st.second = tmRad[evi]*self._R2H*3600.0     # Radians -> seconds - w.r.t. midnight (h=0,m=0)
+                st.second = tmRad[evi]*_R2H*3600.0          # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 
                 # CHECK1: Replacing the line above with the one below, and using utc.to_julian_date() in
                 # compute_position() and removal of self.year-second in set_date_time() is more elegant, but
                 # slightly slower.  See CHECK1 in thise places.  HOWEVER, this also gives different results
                 # for the rise/set times...(?)
-                # st.utc = st.utc.normalize() + dt.timedelta(hours=tmRad[evi]*self._R2H)
+                # st.utc = st.utc.normalize() + dt.timedelta(hours=tmRad[evi]*_R2H)
                 
                 st.compute_position()
                 
@@ -230,18 +231,18 @@ class RiseSet(Constants, Parameters):
         
         
         # Convert times from radians to hours:
-        tmHrs = tmRad*self._R2H
+        tmHrs = tmRad*_R2H
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
         if(self.param._use_north_equals_zero):
-            azalt[1] = (azalt[1] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
-            azalt[2] = (azalt[2] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
+            azalt[1] = (azalt[1] + _PI) % _TWOPI  # Add PI and fold between 0 and 2pi
+            azalt[2] = (azalt[2] + _PI) % _TWOPI  # Add PI and fold between 0 and 2pi
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
         if(self.param._use_degrees):
-            azalt[0] *= self._R2D   # Transit altitude
-            azalt[1] *= self._R2D   # Rise azimuth
-            azalt[2] *= self._R2D   # Set azimuth
+            azalt[0] *= _R2D   # Transit altitude
+            azalt[1] *= _R2D   # Rise azimuth
+            azalt[2] *= _R2D   # Set azimuth
         
         if return_datetimes:  # Return datetimes iso time in hours:
             # tmHrs now contains [transit, rise, set] times in the local timezone.  Convert to datetime Series.
