@@ -133,7 +133,7 @@ class RiseSet(Constants, Parameters):
         
         # Set date and time to midnight of the desired date:
         midnight = origDT.normalize()  # Midnight for the date in OrigDT, keeping the timezone
-        st.setDateTime(midnight)
+        st.set_date_time(midnight)
         
         # Compute the Sun's position:
         st.computePosition()
@@ -168,7 +168,7 @@ class RiseSet(Constants, Parameters):
                 st.second = tmRad[evi]*self._R2H*3600.0       # Radians -> seconds - w.r.t. midnight (h=0,m=0)
                 
                 # CHECK1: Replacing the line above with the one below, and using utc.to_julian_date() in
-                # computePosition() and removal of self.year-second in setDateTime() is more elegant, but
+                # computePosition() and removal of self.year-second in set_date_time() is more elegant, but
                 # slightly slower.  See CHECK1 in thise places.  HOWEVER, this also gives different results
                 # for the rise/set times...(?)
                 # st.utc = st.utc.normalize() + dt.timedelta(hours=tmRad[evi]*self._R2H)

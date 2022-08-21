@@ -29,6 +29,13 @@ class Time:
     
     
     def setDateAndTime(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
+        """This function is obsolescent and will be removed in a future version use set_date_and_time()
+        instead."""
+        _warn_obsolesent('setDateAndTime', 'set_date_and_time', rename=True)
+        return self.set_date_and_time(year,month,day, hour,minute,second)
+    
+    
+    def set_date_and_time(self, year=2000,month=1,day=1, hour=12,minute=0,second=0.0):
         """Set the SolTrack date and time using UTC year, month, day, hour, minute and second.
         
            Parameters:
@@ -41,7 +48,7 @@ class Time:
              second (float):  second of time  (default=0).
         
            Note:
-             Use setDateTime() instead if you have a Python datetime object.
+             Use set_date_time() instead if you have a Python datetime object.
         """
         
         # Combine the date/time values into a single "2D" array with a single row and the original values as
@@ -66,6 +73,13 @@ class Time:
     
     
     def setDateTime(self, dtObj, utc=False):
+        """This function is obsolescent and will be removed in a future version use setDateTime()
+        instead."""
+        _warn_obsolesent('setDateTime', 'set_date_time', rename=True)
+        return self.set_date_time(dtObj, utc)
+    
+    
+    def set_date_time(self, dtObj, utc=False):
         """Set the SolTrack date and time using a (local) Python datetime object.
         
            Parameters:
@@ -75,7 +89,7 @@ class Time:
                Time:  Date and time in a SolTrack time object.
         
            Note:
-             Use setDateAndTime() instead if you have year, month,day, hour, minute and second as separate
+             Use set_date_and_time() instead if you have year, month,day, hour, minute and second as separate
              variables.
         """
         
@@ -118,8 +132,21 @@ class Time:
                Current system date and time in a SolTrack time object.
         """
         
-        self.setDateTime(dt.datetime.now())
+        self.set_date_time(dt.datetime.now())
         
         return
     
     
+def _warn_obsolesent(old_name, new_name, rename=False, extra=False):
+    """Warn that a function is obsolete and will be removed.  Indicate whether this concerns a simple rename, possibly with extra features."""
+    import sys
+    sys.stderr.write('\nWarning: the AstroTool function '+old_name+'() is obsolesent and will be removed in a future version.')
+    sys.stderr.write('  Use '+new_name+'() instead.')
+    if rename:
+        if extra:
+            sys.stderr.write('  The interface has not changed much; a simple search and replace for the function names should suffice, but please see the documentation for new features.\n\n')
+        else:
+            sys.stderr.write('  The interface has not changed; a simple search and replace for the function names should suffice.\n\n')
+    else:
+        sys.stderr.write('  Please see the documentation for details.\n\n')
+    return

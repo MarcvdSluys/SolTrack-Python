@@ -85,7 +85,7 @@ class Position(Constants, Parameters):
         self.julianDay = at.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # CHECK1: the line below instead of above alone makes the whole computePosition() call ~36% slower!
-        # However, combining this with the removal of self.year-self.second in setDateTime() is only slightly
+        # However, combining this with the removal of self.year-self.second in set_date_time() is only slightly
         # slower, but causes problems in computeRiseSet().  See CHECK1 in those places.
         # self.julianDay = self.utc.to_julian_date().to_numpy()
         
