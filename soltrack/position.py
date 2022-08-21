@@ -106,26 +106,26 @@ class Position(Constants, Parameters):
         self._computeLongitude(self.param._compute_distance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self._convertEclipticToEquatorial(self.longitude, self._cosObliquity)
+        self._convert_ecliptic_to_equatorial(self.longitude, self._cosObliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
-        self._convertEquatorialToHorizontal()
+        self._convert_equatorial_to_horizontal()
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(self.param._compute_refr_equatorial):
-            self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuth,
-                                                self.altitude)
+            self._convert_horizontal_to_equatorial(self._sinLat, self._cosLat, self.azimuth,
+                                                   self.altitude)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(self.param._use_north_equals_zero):
-            self._setNorthToZero(self.azimuth, self.hour_angle)
+            self._set_north_to_zero(self.azimuth, self.hour_angle)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._use_degrees):
             self.geo_longitude *= self._R2D    # Convert back to original
             self.geo_latitude  *= self._R2D    # Convert back to original
-            self._convertRadiansToDegrees()    # Convert final results
+            self._convert_radians_to_degrees()    # Convert final results
         
         return
     
@@ -179,7 +179,7 @@ class Position(Constants, Parameters):
     
     
     
-    def _convertEclipticToEquatorial(self, longitude, cosObliquity):
+    def _convert_ecliptic_to_equatorial(self, longitude, cosObliquity):
         """Convert ecliptic coordinates to equatorial coordinates.
         
         Note:
@@ -206,7 +206,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def _convertEquatorialToHorizontal(self):
+    def _convert_equatorial_to_horizontal(self):
         """Convert equatorial to horizontal coordinates.
         
         Also corrects for parallax and atmospheric refraction.
@@ -219,9 +219,9 @@ class Position(Constants, Parameters):
         
         
         # Do the actual coordinate transformation:
-        self.azimuth, sinAlt = self._eq2horizCT(self._sinLat,self._cosLat, self.geo_longitude,
-                                                self._rightAscensionUncorr, self._declinationUncorr,
-                                                self._agst)
+        self.azimuth, sinAlt = self._eq2horiz_ct(self._sinLat,self._cosLat, self.geo_longitude,
+                                                 self._rightAscensionUncorr, self._declinationUncorr,
+                                                 self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
         cosAlt = np.sqrt(1.0 - sinAlt**2)                          # Cosine of the altitude is always positive or zero
@@ -239,7 +239,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def _eq2horizCT(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
+    def _eq2horiz_ct(self, sinLat, cosLat, longitude,  rightAscension, declination, agst):
         """The actual coordinate transformation to convert equatorial to horizontal coordinates.
         
         Parameters:
@@ -274,7 +274,7 @@ class Position(Constants, Parameters):
         return azimuth, sinAlt
     
     
-    def _convertHorizontalToEquatorial(self, sinLat, cosLat, azimuth, altitude):
+    def _convert_horizontal_to_equatorial(self, sinLat, cosLat, azimuth, altitude):
         """Convert (refraction-corrected) horizontal coordinates to the equatorial coordinates hour_angle and
         declination.
         
@@ -301,7 +301,7 @@ class Position(Constants, Parameters):
     
     
     
-    def _setNorthToZero(self, azimuth, hour_angle):
+    def _set_north_to_zero(self, azimuth, hour_angle):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -322,7 +322,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def _convertRadiansToDegrees(self):
+    def _convert_radians_to_degrees(self):
         """Convert final results from radians to degrees.
         
         Note:
@@ -345,7 +345,7 @@ class Position(Constants, Parameters):
         return
     
     
-    def _revPI(self, angle):
+    def _rev_pi(self, angle):
         """Fold an angle in radians to take a value between -PI and +PI.
         
         Parameters:

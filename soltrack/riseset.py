@@ -189,13 +189,13 @@ class RiseSet(Constants, Parameters):
                 
                 st.compute_position()
                 
-                ha  = self._revPI(th0 + st.geo_longitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI
+                ha  = self._rev_pi(th0 + st.geo_longitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI
                 alt = np.arcsin(np.sin(st.geo_latitude)*np.sin(st._declinationUncorr) +
                                 np.cos(st.geo_latitude)*np.cos(st._declinationUncorr)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
-                    dTmRad = -self._revPI(ha)  # -PI - +PI
+                    dTmRad = -self._rev_pi(ha)  # -PI - +PI
                 else:                 # Rise/set
                     dTmRad = (alt-rsa)/(np.cos(st._declinationUncorr)*np.cos(st.geo_latitude)*np.sin(ha))
                     
