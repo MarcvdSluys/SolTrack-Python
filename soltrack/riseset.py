@@ -34,14 +34,14 @@ class RiseSet(Constants, Parameters):
         Parameters.__init__(self)
         
         # Rise, transit and set time:
-        self.riseTime:               float = 0.0;      """Rise time of the Sun (hours LT or UTC)"""
-        self.transitTime:            float = 0.0;      """Transit time of the Sun (hours LT or UTC)"""
-        self.setTime:                float = 0.0;      """Set time of the Sun (hours LT or UTC)"""
+        self.rise_time:               float = 0.0;      """Rise time of the Sun (hours LT or UTC)"""
+        self.transit_time:            float = 0.0;      """Transit time of the Sun (hours LT or UTC)"""
+        self.set_time:                float = 0.0;      """Set time of the Sun (hours LT or UTC)"""
         
         # Rise, transit and set position:
-        self.riseAzimuth:            float = 0.0;      """Rise azimuth of the Sun (radians)"""
-        self.transitAltitude:        float = 0.0;      """Transit altitude of the Sun (radians)"""
-        self.setAzimuth:             float = 0.0;      """Set azimuth of the Sun (radians)"""
+        self.rise_azimuth:            float = 0.0;      """Rise azimuth of the Sun (radians)"""
+        self.transit_altitude:        float = 0.0;      """Transit altitude of the Sun (radians)"""
+        self.set_azimuth:             float = 0.0;      """Set azimuth of the Sun (radians)"""
         
     
     
@@ -98,12 +98,12 @@ class RiseSet(Constants, Parameters):
         
         
         # Store final results:
-        self.transitTime      = trTime
-        self.riseTime         = riTime
-        self.setTime          = seTime
-        self.transitAltitude  = trAlt
-        self.riseAzimuth      = riAz
-        self.setAzimuth       = seAz
+        self.transit_time      = trTime
+        self.rise_time         = riTime
+        self.set_time          = seTime
+        self.transit_altitude  = trAlt
+        self.rise_azimuth      = riAz
+        self.set_azimuth       = seAz
         
         return
     

@@ -34,7 +34,7 @@ class Position(Constants, Parameters):
         # Time:
         self.lt:                     float = None;     """The local date/time for the desired instant, if any"""
         self.utc:                    float = 0.0;      """The universal date/time (UTC) for the desired instant"""
-        self.julianDay:              float = 0.0;      """The Julian day for the desired instant"""
+        self.julian_day:              float = 0.0;      """The Julian day for the desired instant"""
         
         self._tJD:                   float = 0.0;      """Time in Julian days since 2000.0"""
         self._tJC:                   float = 0.0;      """Time in Julian centuries since 2000.0"""
@@ -55,7 +55,7 @@ class Position(Constants, Parameters):
         self.declination:            float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
         
         self._agst:                  float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
-        self.hourAngle:              float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        self.hour_angle:              float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
         
         # Horizontal coordinates:
         self._altitudeUncorr:        float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
@@ -89,15 +89,15 @@ class Position(Constants, Parameters):
         
         
         # Compute the Julian Day from the date and time:
-        self.julianDay = at.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        self.julian_day = at.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # CHECK1: the line below instead of above alone makes the whole compute_position() call ~36% slower!
         # However, combining this with the removal of self.year-self.second in set_date_time() is only slightly
         # slower, but causes problems in computeRiseSet().  See CHECK1 in those places.
-        # self.julianDay = self.utc.to_julian_date().to_numpy()
+        # self.julian_day = self.utc.to_julian_date().to_numpy()
         
         # Derived expressions for time, to be reused:
-        self._tJD  = self.julianDay - 2451545.0     # Time in Julian days since 2000.0
+        self._tJD  = self.julian_day - 2451545.0     # Time in Julian days since 2000.0
         self._tJC  = self._tJD/36525.0              # Time in Julian centuries since 2000.0
         self._tJC2 = self._tJC**2                   # T^2
         
@@ -119,7 +119,7 @@ class Position(Constants, Parameters):
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
         if(self.param._use_north_equals_zero):
-            self._setNorthToZero(self.azimuth, self.hourAngle)
+            self._setNorthToZero(self.azimuth, self.hour_angle)
             
         # If the user wants degrees, convert final results from radians to degrees:
         if(self.param._use_degrees):
@@ -275,7 +275,7 @@ class Position(Constants, Parameters):
     
     
     def _convertHorizontalToEquatorial(self, sinLat, cosLat, azimuth, altitude):
-        """Convert (refraction-corrected) horizontal coordinates to the equatorial coordinates hourAngle and
+        """Convert (refraction-corrected) horizontal coordinates to the equatorial coordinates hour_angle and
         declination.
         
         Parameters:
@@ -294,14 +294,14 @@ class Position(Constants, Parameters):
         cosAlt = np.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
         tanAlt = sinAlt/cosAlt
         
-        self.hourAngle   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hourAngle < 2pi
+        self.hour_angle   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hour_angle < 2pi
         self.declination = np.arcsin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
         
         return
     
     
     
-    def _setNorthToZero(self, azimuth, hourAngle):
+    def _setNorthToZero(self, azimuth, hour_angle):
         """Convert the South=0 convention to North=0 convention for azimuth and hour angle.
         
         Note:
@@ -310,14 +310,14 @@ class Position(Constants, Parameters):
         
         Parameters:
           azimuth              (float):  Azimuth ("wind direction") of the Sun (rad).
-          hourAngle            (float):  Hour angle of the Sun (rad).
+          hour_angle            (float):  Hour angle of the Sun (rad).
         
         """
         
         self.azimuth = (azimuth + self._PI) % self._TWOPI                    # Add PI to set North=0
         
         if(self.param._compute_refr_equatorial):
-            self.hourAngle = (hourAngle + self._PI) % self._TWOPI            # Add PI to set North=0
+            self.hour_angle = (hour_angle + self._PI) % self._TWOPI            # Add PI to set North=0
             
         return
     
@@ -339,7 +339,7 @@ class Position(Constants, Parameters):
         self.altitude *= self._R2D
         
         if(self.param._compute_refr_equatorial):
-            self.hourAngle *= self._R2D
+            self.hour_angle *= self._R2D
             self.declination *= self._R2D
             
         return
