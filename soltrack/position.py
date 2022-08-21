@@ -32,35 +32,35 @@ class Position(Constants, Parameters):
         Parameters.__init__(self)
         
         # Time:
-        self.lt:                     float = None;     """The local date/time for the desired instant, if any"""
-        self.utc:                    float = 0.0;      """The universal date/time (UTC) for the desired instant"""
-        self.julian_day:              float = 0.0;      """The Julian day for the desired instant"""
+        self.lt:                       float = None;     """The local date/time for the desired instant, if any"""
+        self.utc:                      float = 0.0;      """The universal date/time (UTC) for the desired instant"""
+        self.julian_day:               float = 0.0;      """The Julian day for the desired instant"""
         
-        self._tJD:                   float = 0.0;      """Time in Julian days since 2000.0"""
-        self._tJC:                   float = 0.0;      """Time in Julian centuries since 2000.0"""
-        self._tJC2:                  float = 0.0;      """Time in Julian centuries since 2000.0 squared"""
+        self._tJD:                     float = 0.0;      """Time in Julian days since 2000.0"""
+        self._tJC:                     float = 0.0;      """Time in Julian centuries since 2000.0"""
+        self._tJC2:                    float = 0.0;      """Time in Julian centuries since 2000.0 squared"""
         
         # Ecliptical coordinates:
-        self.longitude:              float = 0.0;      """Ecliptical longitude of the Sun (radians)"""
-        self.distance:               float = 0.0;      """Distance Earth-Sun (AU)"""
+        self.longitude:                float = 0.0;      """Ecliptical longitude of the Sun (radians)"""
+        self.distance:                 float = 0.0;      """Distance Earth-Sun (AU)"""
         
         # Obliquity of the ecliptic and nutation:
-        self._obliquity:             float = 0.0;      """Obliquity of the ecliptic (radians)"""
-        self._cosObliquity:          float = 0.0;      """Cosine of the obliquity of the ecliptic"""
-        self._nutationLon:           float = 0.0;      """Nutation in longitude (radians)"""
+        self._obliquity:               float = 0.0;      """Obliquity of the ecliptic (radians)"""
+        self._cos_obliquity:           float = 0.0;      """Cosine of the obliquity of the ecliptic"""
+        self._nutation_lon:            float = 0.0;      """Nutation in longitude (radians)"""
         
         # Equatorial coordinates and sidereal time:
-        self._rightAscensionUncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
-        self._declinationUncorr:     float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
-        self.declination:            float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
+        self._right_ascension_uncorr:  float = 0.0;      """Right ascension of the Sun, UNCORRECTED for refraction (radians)"""
+        self._declination_uncorr:      float = 0.0;      """Declination of the Sun, UNCORRECTED for refraction (radians)"""
+        self.declination:              float = 0.0;      """Declination of the Sun, corrected for refraction (radians)"""
         
-        self._agst:                  float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
-        self.hour_angle:              float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
+        self._agst:                    float = 0.0;      """Apparent Greenwich sidereal time for the instant of interest (radians)"""
+        self.hour_angle:               float = 0.0;      """Hour angle of the Sun, corrected for refraction (radians)"""
         
         # Horizontal coordinates:
-        self._altitudeUncorr:        float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
-        self.altitude:               float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
-        self.azimuth:                float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
+        self._altitude_uncorr:         float = 0.0;      """Altitude of the Sun, UNCORRECTED for refraction (radians)"""
+        self.altitude:                 float = 0.0;      """Altitude of the Sun, corrected for refraction (radians)"""
+        self.azimuth:                  float = 0.0;      """Azimuth of the Sun, corrected for refraction (radians)"""
         
         
     
@@ -84,8 +84,8 @@ class Position(Constants, Parameters):
             self.geo_latitude  /= self._R2D
         
         # Compute these once and reuse:
-        self._sinLat = np.sin(self.geo_latitude)
-        self._cosLat = np.sqrt(1.0 - self._sinLat**2)  # Cosine of a latitude is always positive or zero
+        self._sin_lat = np.sin(self.geo_latitude)
+        self._cos_lat = np.sqrt(1.0 - self._sin_lat**2)  # Cosine of a latitude is always positive or zero
         
         
         # Compute the Julian Day from the date and time:
@@ -103,10 +103,10 @@ class Position(Constants, Parameters):
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic and nutation:
-        self._computeLongitude(self.param._compute_distance)
+        self._compute_longitude(self.param._compute_distance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
-        self._convert_ecliptic_to_equatorial(self.longitude, self._cosObliquity)
+        self._convert_ecliptic_to_equatorial(self.longitude, self._cos_obliquity)
         
         # Convert equatorial coordinates to horizontal coordinates, correcting for parallax and refraction:
         self._convert_equatorial_to_horizontal()
@@ -114,7 +114,7 @@ class Position(Constants, Parameters):
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
         if(self.param._compute_refr_equatorial):
-            self._convert_horizontal_to_equatorial(self._sinLat, self._cosLat, self.azimuth,
+            self._convert_horizontal_to_equatorial(self._sin_lat, self._cos_lat, self.azimuth,
                                                    self.altitude)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
@@ -131,7 +131,7 @@ class Position(Constants, Parameters):
     
     
     
-    def _computeLongitude(self, compute_distance=True):
+    def _compute_longitude(self, compute_distance=True):
         """Compute the ecliptic longitude of the Sun for a given instant.
         
         Note:
@@ -172,8 +172,8 @@ class Position(Constants, Parameters):
         self.distance = dist                                                             # Distance (AU)
         
         self._obliquity   = eps0 + deps                                                  # True obliquity of the ecliptic
-        self._cosObliquity = np.cos(self._obliquity)                                     # Need the cosine later on
-        self._nutationLon = dpsi                                                         # Nutation in longitude
+        self._cos_obliquity = np.cos(self._obliquity)                                    # Need the cosine later on
+        self._nutation_lon = dpsi                                                        # Nutation in longitude
         
         return
     
@@ -200,8 +200,8 @@ class Position(Constants, Parameters):
         sinLon = np.sin(longitude)
         sinObl = np.sqrt(1.0 - cosObliquity**2)               # Sine of the obliquity of the ecliptic will be positive in the forseeable future
         
-        self._rightAscensionUncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
-        self._declinationUncorr     = np.arcsin(sinObl*sinLon)
+        self._right_ascension_uncorr  = np.arctan2(cosObliquity*sinLon, np.cos(longitude)) % self._TWOPI  # 0 <= azimuth < 2pi
+        self._declination_uncorr     = np.arcsin(sinObl*sinLon)
         
         return
     
@@ -215,12 +215,12 @@ class Position(Constants, Parameters):
         
         # We need the AGST for the coordinate transformation:
         gmst       = 4.89496121 + 6.300388098985*self._tJD + 6.77e-6*self._tJC2  # Greenwich mean sidereal time
-        self._agst = gmst + self._nutationLon * self._cosObliquity               # Correction for equation of the equinoxes . apparent Greenwich sidereal time
+        self._agst = gmst + self._nutation_lon * self._cos_obliquity             # Correction for equation of the equinoxes . apparent Greenwich sidereal time
         
         
         # Do the actual coordinate transformation:
-        self.azimuth, sinAlt = self._eq2horiz_ct(self._sinLat,self._cosLat, self.geo_longitude,
-                                                 self._rightAscensionUncorr, self._declinationUncorr,
+        self.azimuth, sinAlt = self._eq2horiz_ct(self._sin_lat,self._cos_lat, self.geo_longitude,
+                                                 self._right_ascension_uncorr, self._declination_uncorr,
                                                  self._agst)
         
         alt = np.arcsin( sinAlt )                                  # Altitude of the Sun above the horizon (rad)
@@ -228,7 +228,7 @@ class Position(Constants, Parameters):
         
         # Correct for parallax:
         alt -= 4.2635e-5 * cosAlt                                  # Horizontal parallax = 8.794" = 4.2635e-5 rad
-        self._altitudeUncorr = np.copy(alt)                        # Sun altitude, uncorrected for refraction.  If not copied, _altitudeUncorr and altitude will be converted to degrees TWICE!
+        self._altitude_uncorr = np.copy(alt)                       # Sun altitude, uncorrected for refraction.  If not copied, _altitude_uncorr and altitude will be converted to degrees TWICE!
         
         # Correct for atmospheric refraction:
         dalt = 2.967e-4 / np.tan(alt + 3.1376e-3/(alt + 8.92e-2))  # Refraction correction in altitude
@@ -294,7 +294,7 @@ class Position(Constants, Parameters):
         cosAlt = np.sqrt(1.0 - sinAlt**2)                             # Cosine of an altitude is always positive or zero
         tanAlt = sinAlt/cosAlt
         
-        self.hour_angle   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )      # Local Hour Angle:  0 <= hour_angle < 2pi
+        self.hour_angle   = np.arctan2( sinAz,   cosAz  * sinLat + tanAlt * cosLat )     # Local Hour Angle:  0 <= hour_angle < 2pi
         self.declination = np.arcsin(  sinLat * sinAlt  -  cosLat * cosAlt * cosAz  )    # Declination
         
         return
@@ -317,7 +317,7 @@ class Position(Constants, Parameters):
         self.azimuth = (azimuth + self._PI) % self._TWOPI                    # Add PI to set North=0
         
         if(self.param._compute_refr_equatorial):
-            self.hour_angle = (hour_angle + self._PI) % self._TWOPI            # Add PI to set North=0
+            self.hour_angle = (hour_angle + self._PI) % self._TWOPI          # Add PI to set North=0
             
         return
     
@@ -331,10 +331,10 @@ class Position(Constants, Parameters):
         """
         
         self.longitude *= self._R2D
-        self._rightAscensionUncorr *= self._R2D
-        self._declinationUncorr *= self._R2D
+        self._right_ascension_uncorr *= self._R2D
+        self._declination_uncorr *= self._R2D
         
-        self._altitudeUncorr *= self._R2D
+        self._altitude_uncorr *= self._R2D
         self.azimuth *= self._R2D
         self.altitude *= self._R2D
         
