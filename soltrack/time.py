@@ -72,18 +72,18 @@ class Time:
         return
     
     
-    def setDateTime(self, dtObj, utc=False):
+    def setDateTime(self, dt_obj, utc=False):
         """This function is obsolescent and will be removed in a future version.  Use setDateTime()
         instead."""
         _warn_obsolescent('setDateTime', 'set_date_time', rename=True)
-        return self.set_date_time(dtObj, utc)
+        return self.set_date_time(dt_obj, utc)
     
     
-    def set_date_time(self, dtObj, utc=False):
+    def set_date_time(self, dt_obj, utc=False):
         """Set the SolTrack date and time using a (local) Python datetime object.
         
            Parameters:
-               dtObj (datetime(64)):  Date and time in a Python datetime object (UTC if timezone naive).
+               dt_obj (datetime(64)):  Date and time in a Python datetime object (UTC if timezone naive).
         
            Returns:
                Time:  Date and time in a SolTrack time object.
@@ -94,16 +94,16 @@ class Time:
         """
         
         if utc:  # up to ~29% faster if datetimes are known to be UTC.  Create DatetimeIndex with UTC times directly:
-            if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
-                self.utc = pd.to_datetime(np.asarray([dtObj]))  # DatetimeIndex
+            if np.ndim(dt_obj) == 0:  # Scalar, needs to be converted using [array]:
+                self.utc = pd.to_datetime(np.asarray([dt_obj]))  # DatetimeIndex
             else:
-                self.utc = pd.to_datetime(np.asarray(dtObj))    # DatetimeIndex
+                self.utc = pd.to_datetime(np.asarray(dt_obj))    # DatetimeIndex
             
         else:  # Create DatetimeIndex with local times, then convert to UTC:
-            if np.ndim(dtObj) == 0:  # Scalar, needs to be converted using [array]:
-                self.lt = pd.to_datetime(np.asarray([dtObj]))   # DatetimeIndex
+            if np.ndim(dt_obj) == 0:  # Scalar, needs to be converted using [array]:
+                self.lt = pd.to_datetime(np.asarray([dt_obj]))   # DatetimeIndex
             else:
-                self.lt = pd.to_datetime(np.asarray(dtObj))     # DatetimeIndex
+                self.lt = pd.to_datetime(np.asarray(dt_obj))     # DatetimeIndex
                 
             # Ensure timestamps are in UTC:
             self.utc = pd.to_datetime(self.lt, utc=True)  # utc=True: make timezone aware (if not already), and set TZ=UTC (converting if needed).

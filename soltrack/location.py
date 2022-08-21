@@ -24,34 +24,33 @@ from dataclasses import dataclass
 class Location:
     """Class containing the geographic location to compute the Sun position for."""
     
-    geoLongitude: float = 0.0;      """Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees)."""
-    geoLatitude:  float = 0.0;      """Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees)."""
+    geo_longitude: float = 0.0;      """Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees)."""
+    geo_latitude:  float = 0.0;      """Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees)."""
     
     pressure:     float = 101.0;    """Air pressure at the site (kPa)."""
     temperature:  float = 283.0;    """Air temperature at the site (K)."""
     
     
-    def setLocation(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
+    def setLocation(self, geo_longitude, geo_latitude, pressure=101.0, temperature=283.0):
         """This function is obsolescent and will be removed in a future version.  Use set_location()
         instead."""
         _warn_obsolescent('setLocation', 'set_location', rename=True)
-        return self.set_location(geoLongitude, geoLatitude, pressure, temperature)
+        return self.set_location(geo_longitude, geo_latitude, pressure, temperature)
     
     
-    def set_location(self, geoLongitude, geoLatitude, pressure=101.0, temperature=283.0):
+    def set_location(self, geo_longitude, geo_latitude, pressure=101.0, temperature=283.0):
         """Setter for the details of the observer/site location to compute the Sun position for.
         
         Parameters:
-          geoLongitude (float):  Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees).
-          geoLatitude  (float):  Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees).
+          geo_longitude (float):  Geographic longitude of the observer/site (>0 = east of Greenwich; radians or degrees).
+          geo_latitude  (float):  Geographic latitude of the observer/site (>0 = northern hemisphere; radians or degrees).
           
-          pressure     (float):  Air pressure at the site (kPa).
-          temperature  (float):  Air temperature at the site (K).
-        
+          pressure      (float):  Air pressure at the site (kPa).
+          temperature   (float):  Air temperature at the site (K).
         """
         
-        self.geoLongitude = geoLongitude
-        self.geoLatitude  = geoLatitude
+        self.geo_longitude = geo_longitude
+        self.geo_latitude  = geo_latitude
         
         self.pressure     = pressure
         self.temperature  = temperature

@@ -79,12 +79,12 @@ class Position(Constants, Parameters):
         import astrotool as at
         
         # If the user uses degrees, convert the geographic location to radians:
-        if(self.param._useDegrees):
-            self.geoLongitude /= self._R2D
-            self.geoLatitude  /= self._R2D
+        if(self.param._use_degrees):
+            self.geo_longitude /= self._R2D
+            self.geo_latitude  /= self._R2D
         
         # Compute these once and reuse:
-        self._sinLat = np.sin(self.geoLatitude)
+        self._sinLat = np.sin(self.geo_latitude)
         self._cosLat = np.sqrt(1.0 - self._sinLat**2)  # Cosine of a latitude is always positive or zero
         
         
@@ -103,7 +103,7 @@ class Position(Constants, Parameters):
         
         
         # Compute the ecliptic longitude of the Sun and the obliquity of the ecliptic and nutation:
-        self._computeLongitude(self.param._computeDistance)
+        self._computeLongitude(self.param._compute_distance)
         
         # Convert ecliptic coordinates to geocentric equatorial coordinates:
         self._convertEclipticToEquatorial(self.longitude, self._cosObliquity)
@@ -113,33 +113,33 @@ class Position(Constants, Parameters):
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
-        if(self.param._computeRefrEquatorial):
+        if(self.param._compute_refr_equatorial):
             self._convertHorizontalToEquatorial(self._sinLat, self._cosLat, self.azimuth,
                                                 self.altitude)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
-        if(self.param._useNorthEqualsZero):
+        if(self.param._use_north_equals_zero):
             self._setNorthToZero(self.azimuth, self.hourAngle)
             
         # If the user wants degrees, convert final results from radians to degrees:
-        if(self.param._useDegrees):
-            self.geoLongitude *= self._R2D     # Convert back to original
-            self.geoLatitude  *= self._R2D     # Convert back to original
+        if(self.param._use_degrees):
+            self.geo_longitude *= self._R2D    # Convert back to original
+            self.geo_latitude  *= self._R2D    # Convert back to original
             self._convertRadiansToDegrees()    # Convert final results
         
         return
     
     
     
-    def _computeLongitude(self, computeDistance=True):
+    def _computeLongitude(self, compute_distance=True):
         """Compute the ecliptic longitude of the Sun for a given instant.
         
         Note:
           - Also computes and stores the obliquity of the ecliptic and nutation.
         
         Parameters:
-          computeDistance (bool):  Compute distance to the Sun.  Note that this results in a marginally better
-                                   longitude as well.  (optional, default=True).
+          compute_distance (bool):  Compute distance to the Sun.  Note that this results in a marginally better
+                                    longitude as well.  (optional, default=True).
 
         """
         
@@ -155,7 +155,7 @@ class Position(Constants, Parameters):
         omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2      # Lon. of Moon's mean ascending node
         dpsi = -8.338601e-5*np.sin(omg)                                                  # Nutation in longitude
         dist = 1.0000010178                                                              # Mean distance to the Sun in AU
-        if(computeDistance):
+        if(compute_distance):
             ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2  # Eccentricity of the Earth's orbit
             nu = ma + sec                                                                # True anomaly
             dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                            # Geocentric distance of the Sun in AU
@@ -219,7 +219,7 @@ class Position(Constants, Parameters):
         
         
         # Do the actual coordinate transformation:
-        self.azimuth, sinAlt = self._eq2horizCT(self._sinLat,self._cosLat, self.geoLongitude,
+        self.azimuth, sinAlt = self._eq2horizCT(self._sinLat,self._cosLat, self.geo_longitude,
                                                 self._rightAscensionUncorr, self._declinationUncorr,
                                                 self._agst)
         
@@ -316,7 +316,7 @@ class Position(Constants, Parameters):
         
         self.azimuth = (azimuth + self._PI) % self._TWOPI                    # Add PI to set North=0
         
-        if(self.param._computeRefrEquatorial):
+        if(self.param._compute_refr_equatorial):
             self.hourAngle = (hourAngle + self._PI) % self._TWOPI            # Add PI to set North=0
             
         return
@@ -338,7 +338,7 @@ class Position(Constants, Parameters):
         self.azimuth *= self._R2D
         self.altitude *= self._R2D
         
-        if(self.param._computeRefrEquatorial):
+        if(self.param._compute_refr_equatorial):
             self.hourAngle *= self._R2D
             self.declination *= self._R2D
             

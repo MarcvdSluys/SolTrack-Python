@@ -45,25 +45,25 @@ class RiseSet(Constants, Parameters):
         
     
     
-    def computeRiseSet(self, rsAlt=0.0, accur=1e-5, return_datetimes=True):
+    def computeRiseSet(self, rs_alt=0.0, accur=1e-5, return_datetimes=True):
         """This function is obsolescent and will be removed in a future version.  Use compute_rise_set()
         instead."""
         _warn_obsolescent('computeRiseSet', 'compute_rise_set', rename=True)
-        return self.compute_rise_set(rsAlt, accur, return_datetimes)
+        return self.compute_rise_set(rs_alt, accur, return_datetimes)
     
     
-    def compute_rise_set(self, rsAlt=0.0, accur=1e-5, return_datetimes=True):
+    def compute_rise_set(self, rs_alt=0.0, accur=1e-5, return_datetimes=True):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude.
         
         Parameters:
-          rsAlt            (float):  Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rsAlt>pi/2 to compute transit only.
+          rs_alt           (float):  Altitude to return rise/set data for (radians; optional, default=0.0 meaning actual rise/set).  Set rs_alt>pi/2 to compute transit only.
           accur:           (float):  Accuracy (rad).  Default: 1e-5 rad ~ 0.14s.  Don't make this smaller than 1e-16.
           return_datetimes (bool):   Return times as datetimes rather than decimal hours.  Defaults to True.
         
         Note:
           - rise/set/transit times are in the LOCAL timezone used for the input (hence UTC if UTC was used).
-          - if rsAlt == 0.0, actual rise and set times are computed
-          - if rsAlt != 0.0, the routine calculates when alt = rsAlt is reached
+          - if rs_alt == 0.0, actual rise and set times are computed
+          - if rs_alt != 0.0, the routine calculates when alt = rs_alt is reached
           - returns times, rise/set azimuth and transit altitude in the class riseSet
          
           See:
@@ -75,13 +75,13 @@ class RiseSet(Constants, Parameters):
         
         # CHECK: we should use local time for local Sun rise/transit/set, but what do we do if UTC is available only?
         if self.lt is not None:
-            origDT = self.lt
+            orig_dt = self.lt
         else:
-            origDT = self.utc  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
+            orig_dt = self.utc  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
         
             
-        for OrigDTi in origDT:  # Loop over dates in array
-            tmHrs, azalt = self._compute_rise_set_single(OrigDTi, rsAlt, accur, return_datetimes)  # Compute r/s/t for a single date
+        for OrigDTi in orig_dt:  # Loop over dates in array
+            tmHrs, azalt = self._compute_rise_set_single(OrigDTi, rs_alt, accur, return_datetimes)  # Compute r/s/t for a single date
             
             # Returned datetimes are timezone naive.  Add the timezone of the original date, if any:
             if return_datetimes:
@@ -108,19 +108,19 @@ class RiseSet(Constants, Parameters):
         return
     
     
-    def _computeRiseSetSingle(self, origDT, rsAlt, accur, return_datetimes):
+    def _computeRiseSetSingle(self, orig_dt, rs_alt, accur, return_datetimes):
         """This function is obsolescent and will be removed in a future version.  Use compute_rise_set()
         instead."""
         _warn_obsolescent('_computeRiseSetSingle', '_compute_rise_set_single', rename=True)
-        return self._compute_rise_set_single(origDT, rsAlt, accur, return_datetimes)
+        return self._compute_rise_set_single(orig_dt, rs_alt, accur, return_datetimes)
     
         
-    def _compute_rise_set_single(self, origDT, rsAlt, accur, return_datetimes):
+    def _compute_rise_set_single(self, orig_dt, rs_alt, accur, return_datetimes):
         """Compute rise, transit and set times for the Sun, as well as their azimuths/altitude for a single date.
         
         Parameters:
-          origDt          (datetime):  Original datetime of the date to compute the rise, set and transit for..
-          rsAlt              (float):  Altitude to return rise/set data for (radians).  Set rsAlt>pi/2 to compute transit only.
+          orig_dt         (datetime):  Original datetime of the date to compute the rise, set and transit for..
+          rs_alt             (float):  Altitude to return rise/set data for (radians).  Set rs_alt>pi/2 to compute transit only.
           accur:             (float):  Accuracy (rad).  Don't make this smaller than 1e-16.
           return_datetimes    (bool):  Return times as datetimes rather than decimal hours.
         
@@ -128,7 +128,7 @@ class RiseSet(Constants, Parameters):
         """
         
         rsa = -0.8333/self._R2D               # Standard altitude for the Sun in radians
-        if(abs(rsAlt) > 1.e-9): rsa = rsAlt   # Use a user-specified altitude
+        if(abs(rs_alt) > 1.e-9): rsa = rs_alt   # Use a user-specified altitude
         
         tmRad = np.zeros(3)
         azalt = np.zeros(3)
@@ -138,15 +138,15 @@ class RiseSet(Constants, Parameters):
         # We need a local SolTrack instance for the same location (but in radians!), but with different settings
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
-        if(self.param._useDegrees):
-            st = self.__class__(self.geoLongitude/self._R2D, self.geoLatitude/self._R2D, useDegrees=False,
-                                useNorthEqualsZero=False, computeRefrEquatorial=True, computeDistance=False)
+        if(self.param._use_degrees):
+            st = self.__class__(self.geo_longitude/self._R2D, self.geo_latitude/self._R2D, use_degrees=False,
+                                use_north_equals_zero=False, compute_refr_equatorial=True, compute_distance=False)
         else:
-            st = self.__class__(self.geoLongitude, self.geoLatitude, useDegrees=False, useNorthEqualsZero=False,
-                                computeRefrEquatorial=True, computeDistance=False)
+            st = self.__class__(self.geo_longitude, self.geo_latitude, use_degrees=False, use_north_equals_zero=False,
+                                compute_refr_equatorial=True, compute_distance=False)
         
         # Set date and time to midnight of the desired date:
-        midnight = origDT.normalize()  # Midnight for the date in OrigDT, keeping the timezone
+        midnight = orig_dt.normalize()  # Midnight for the date in OrigDT, keeping the timezone
         st.set_date_time(midnight)
         
         # Compute the Sun's position:
@@ -157,8 +157,8 @@ class RiseSet(Constants, Parameters):
         agst0 = st._agst      # AGST for midnight
         
         evMax = 3                  # Compute transit, rise and set times by default (1-3)
-        cosH0 = (np.sin(rsa) - np.sin(st.geoLatitude) * np.sin(st._declinationUncorr)) / (np.cos(st.geoLatitude) *
-                                                                                          np.cos(st._declinationUncorr))
+        cosH0 = (np.sin(rsa) - np.sin(st.geo_latitude) * np.sin(st._declinationUncorr)) / (np.cos(st.geo_latitude) *
+                                                                                           np.cos(st._declinationUncorr))
         
         if(abs(cosH0) > 1.0):      # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
@@ -166,7 +166,7 @@ class RiseSet(Constants, Parameters):
             h0 = np.arccos(cosH0) % self._PI  # Should probably work without %
         
         
-        tmRad[0] = (st._rightAscensionUncorr - st.geoLongitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
+        tmRad[0] = (st._rightAscensionUncorr - st.geo_longitude - st._agst) % self._TWOPI  # Transit time in radians; lon0 > 0 for E
         if(evMax > 1):
             tmRad[1] = (tmRad[0] - h0) % self._TWOPI   # Rise time in radians
             tmRad[2] = (tmRad[0] + h0) % self._TWOPI   # Set time in radians
@@ -189,15 +189,15 @@ class RiseSet(Constants, Parameters):
                 
                 st.compute_position()
                 
-                ha  = self._revPI(th0 + st.geoLongitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI
-                alt = np.arcsin(np.sin(st.geoLatitude)*np.sin(st._declinationUncorr) +
-                                np.cos(st.geoLatitude)*np.cos(st._declinationUncorr)*np.cos(ha))  # Altitude
+                ha  = self._revPI(th0 + st.geo_longitude - st._rightAscensionUncorr)        # Hour angle: -PI - +PI
+                alt = np.arcsin(np.sin(st.geo_latitude)*np.sin(st._declinationUncorr) +
+                                np.cos(st.geo_latitude)*np.cos(st._declinationUncorr)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
                 if(evi==0):           # Transit
                     dTmRad = -self._revPI(ha)  # -PI - +PI
                 else:                 # Rise/set
-                    dTmRad = (alt-rsa)/(np.cos(st._declinationUncorr)*np.cos(st.geoLatitude)*np.sin(ha))
+                    dTmRad = (alt-rsa)/(np.cos(st._declinationUncorr)*np.cos(st.geo_latitude)*np.sin(ha))
                     
                 tmRad[evi] = tmRad[evi] + dTmRad
                 
@@ -211,18 +211,18 @@ class RiseSet(Constants, Parameters):
             
             
             if(iter > 30):  # Convergence failed
-                print('\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n' % (evi,rsAlt))
+                print('\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n' % (evi,rs_alt))
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
             else:               # Result converged, store it
                 if(evi == 0):
                     azalt[evi] = alt                                                                      # Transit altitude
                 else:
-                    azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(st.geoLatitude)  -
-                                                           np.tan(st._declinationUncorr) * np.cos(st.geoLatitude) ) )   # Rise,set hour angle -> azimuth
+                    azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(st.geo_latitude)  -
+                                                           np.tan(st._declinationUncorr) * np.cos(st.geo_latitude) ) )   # Rise,set hour angle -> azimuth
             
             
-            if(tmRad[evi] < 0.0 and abs(rsAlt) < 1.e-9):
+            if(tmRad[evi] < 0.0 and abs(rs_alt) < 1.e-9):
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
                 
@@ -233,12 +233,12 @@ class RiseSet(Constants, Parameters):
         tmHrs = tmRad*self._R2H
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
-        if(self.param._useNorthEqualsZero):
+        if(self.param._use_north_equals_zero):
             azalt[1] = (azalt[1] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
             azalt[2] = (azalt[2] + self._PI) % self._TWOPI  # Add PI and fold between 0 and 2pi
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
-        if(self.param._useDegrees):
+        if(self.param._use_degrees):
             azalt[0] *= self._R2D   # Transit altitude
             azalt[1] *= self._R2D   # Rise azimuth
             azalt[2] *= self._R2D   # Set azimuth

@@ -41,31 +41,30 @@ from .riseset   import RiseSet
 class SolTrack(Location, Time, Position, RiseSet):
     
     
-    def __init__(self, geoLongitude,geoLatitude, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None, computeDistance=None):
+    def __init__(self, geo_longitude,geo_latitude, use_degrees=None, use_north_equals_zero=None, compute_refr_equatorial=None, compute_distance=None):
         
         """Construct a SolTrack object with specified geographical location and parameters (settings).
         
         Parameters:
-          geoLongitude (float):           Geographical longitude of the observer or installation (radians or degrees, depending on useDegrees).
-          geoLatitude (float):            Geographical latitude of the observer or installation (radians or degrees, depending on useDegrees).
+          geo_longitude (float):           Geographical longitude of the observer or installation (radians or degrees, depending on use_degrees).
+          geo_latitude (float):            Geographical latitude of the observer or installation (radians or degrees, depending on use_degrees).
         
-          useDegrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
-          useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
-          computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
-          computeDistance (bool):         Compute the distance to the Sun.
+          use_degrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
+          use_north_equals_zero (bool):    Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
+          compute_refr_equatorial (bool):  Compute refraction-corrected equatorial coordinates (Hour angle, declination).
+          compute_distance (bool):         Compute the distance to the Sun.
         
         Note:
           The SolTrack class is a composition of the Location, Time, Position and RiseSet classes.
-        
         """
         
         # Create Constants and Parameters objects:
         self.cst       = Constants()
         self.param     = Parameters()
-        self.param.set_parameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
+        self.param.set_parameters(use_degrees, use_north_equals_zero, compute_refr_equatorial, compute_distance)
         
         # Use composition to obtain the attributes from Location, Time, Position and RiseSet:
-        Location.__init__(self, geoLongitude, geoLatitude)  # Set the geographic location
+        Location.__init__(self, geo_longitude, geo_latitude)  # Set the geographic location
         Time.__init__(self)
         Position.__init__(self)
         RiseSet.__init__(self)

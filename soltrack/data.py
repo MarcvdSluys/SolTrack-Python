@@ -36,35 +36,35 @@ class Constants:
 class Parameters:
     """Class containing SolTrack parameters/settings."""
     
-    _useDegrees:             bool  = False;   """Input (geographic position) and output are in degrees."""
-    _useNorthEqualsZero:     bool  = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East."""
-    _computeRefrEquatorial:  bool  = True;    """Compute refraction-corrected equatorial coordinates (Hour angle, declination)."""
-    _computeDistance:        bool  = True;    """Compute the distance to the Sun."""
+    _use_degrees:              bool  = False;   """Input (geographic position) and output are in degrees."""
+    _use_north_equals_zero:    bool  = False;   """Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East."""
+    _compute_refr_equatorial:  bool  = True;    """Compute refraction-corrected equatorial coordinates (Hour angle, declination)."""
+    _compute_distance:         bool  = True;    """Compute the distance to the Sun."""
     
     
-    def setParameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
-                      computeDistance=None):
+    def setParameters(self, use_degrees=None, use_north_equals_zero=None, compute_refr_equatorial=None,
+                      compute_distance=None):
         """This function is obsolescent and will be removed in a future version.  Use set_parameters()
         instead."""
         _warn_obsolescent('setParameters', 'set_parameters', rename=True)
-        return self.set_parameters(useDegrees, useNorthEqualsZero, computeRefrEquatorial, computeDistance)
+        return self.set_parameters(use_degrees, use_north_equals_zero, compute_refr_equatorial, compute_distance)
     
         
-    def set_parameters(self, useDegrees=None, useNorthEqualsZero=None, computeRefrEquatorial=None,
-                       computeDistance=None):
+    def set_parameters(self, use_degrees=None, use_north_equals_zero=None, compute_refr_equatorial=None,
+                       compute_distance=None):
         """Set the SolTrack parameters (settings).
         
         Parameters:
-          useDegrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
-          useNorthEqualsZero (bool):      Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
-          computeRefrEquatorial (bool):   Compute refraction-corrected equatorial coordinates (Hour angle, declination).
-          computeDistance (bool):         Compute the distance to the Sun.
+          use_degrees (bool):              Input (geographic position) and output are in degrees, rather than radians.
+          use_north_equals_zero (bool):    Azimuth: 0 = South, pi/2 (90deg) = West  ->  0 = North, pi/2 (90deg) = East.
+          compute_refr_equatorial (bool):  Compute refraction-corrected equatorial coordinates (Hour angle, declination).
+          compute_distance (bool):         Compute the distance to the Sun.
         """
         
-        if(useDegrees is not None):             self._useDegrees             = useDegrees
-        if(useNorthEqualsZero is not None):     self._useNorthEqualsZero     = useNorthEqualsZero
-        if(computeRefrEquatorial is not None):  self._computeRefrEquatorial  = computeRefrEquatorial
-        if(computeDistance is not None):        self._computeDistance        = computeDistance
+        if(use_degrees is not None):              self._use_degrees              = use_degrees
+        if(use_north_equals_zero is not None):    self._use_north_equals_zero    = use_north_equals_zero
+        if(compute_refr_equatorial is not None):  self._compute_refr_equatorial  = compute_refr_equatorial
+        if(compute_distance is not None):         self._compute_distance         = compute_distance
         
         return
     
