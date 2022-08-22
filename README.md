@@ -9,22 +9,22 @@ Status](https://readthedocs.org/projects/soltrack/badge/?version=latest)](https:
 A free, fast and simple Python package to compute the position of the Sun, as well as its rise and set times.
 SolTrack was originally written in C/C++ by [Marc van der Sluys](http://marc.vandersluys.nl) of the department
 of astrophysics of the Radboud University Nijmegen, the Netherlands and the Sustainable energy research group
-of the HAN University of Applied Sciences in Arnhem, the Netherlands,[^Nikhef] and Paul van Kan of the
-Sustainable energy research group of the HAN University of Applied Sciences in Arnhem, the Netherlands.  The
-code has now been translated to pure Python and can be used under the conditions of the EUPL 1.2 licence.
-[^Nikhef]: Now at the Netherlands Institute for Nuclear and High-Energy Physics (Nikhef) and the Institute for
-	Gravitational and Subatomic Physics (GRASP) at Utrecht University in the Netherlands.
+of the HAN University of Applied Sciences in Arnhem, the Netherlands (now at the Netherlands Institute for
+Nuclear and High-Energy Physics (Nikhef) and the Institute for Gravitational and Subatomic Physics (GRASP) at
+Utrecht University in the Netherlands), and Paul van Kan of the Sustainable energy research group of the HAN
+University of Applied Sciences in Arnhem, the Netherlands.  The code has now been translated to pure Python
+and can be used under the conditions of the EUPL 1.2 licence.
 
-SolTrack can perform up to 1.5 million position calculations per second on a single 3.4 GHz core of my
-laptop,[^C] with an accuracy of 0.0030 ± 0.0016°.
-[^C]: The [C version of SolTrack](http://soltrack.sourceforge.net/) is about twice as fast.
+SolTrack can perform up to 1.5 million position calculations per second on a single 3.4 GHz core of my laptop
+(the [C version of SolTrack](http://soltrack.sourceforge.net/) is about twice as fast) with an accuracy of
+0.0030 ± 0.0016°.
 
 
 ## Installation
 
 This package can be installed using `pip install soltrack`.  This should automatically install the dependency
-packages `numpy`, `pandas`, `astroconst` and `astrotool` (if you're not using a Python version older than 3.7,
-you will need to install `dataclasses` as well) if they haven't been installed already.  If you are installing
+packages `numpy`, `pandas`, `astroconst` and `astrotool` if they haven't been installed already (if you're not
+using a Python version older than 3.7, you will need to install `dataclasses` as well).  If you are installing
 by hand, ensure that these packages are installed as well.
 
 
@@ -34,12 +34,12 @@ by hand, ensure that these packages are installed as well.
 
 The update from SolTrack v0.1.4 to v0.3.0 is **not backwards compatible**.  Most public members/variables and
 methods/functions, as well as dummy arguments have been renamed in order to comply better with the Python
-standards.  I have tried to put as much nuisance into a single update as possible,[^nuisance] so that this
-will hopefully not happen again in the future.  For public methods, the obsolescent old name is kept as an
-alias, and warnings are issued when used, instructing how to adapt your code.  In many cases a variable or
-function name `likeThis` will have been replaced to one `like_this`, i.e. upper case replaced with an
-underscore and lower case.  See the [documentation](https://soltrack.readthedocs.io) for more details.
-[^nuisance]: As opposed to in multiple updates, rather than as opposed to as little nuisance as possible.
+standards.  I have tried to put as much nuisance into a single update as possible (as opposed to in multiple
+updates, rather than as opposed to as little nuisance as possible), so that this will hopefully not happen
+again in the future.  For public methods, the obsolescent old name is kept as an alias, and warnings are
+issued when used, instructing how to adapt your code.  In many cases a variable or function name `likeThis`
+will have been replaced to one `like_this`, i.e. upper case replaced with an underscore and lower case.  See
+the [documentation](https://soltrack.readthedocs.io) for more details.
 
 
 ### Code example for a number or range of datetimes
