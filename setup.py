@@ -20,7 +20,7 @@ setup(
     url='http://soltrack.sf.net',
     
     packages=['soltrack'],
-    install_requires=['astrotool','numpy','pandas'],
+    install_requires=['astroconst','astrotool','numpy','pandas'],
     long_description=long_description,
     long_description_content_type='text/markdown',
     
