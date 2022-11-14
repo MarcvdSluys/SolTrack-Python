@@ -264,6 +264,9 @@ For single datetimes, 1000 calculations take about 0.68 seconds on the single CP
 
 ## SolTrack pages
 
+* [Van der Sluys & Van Kan](https://arxiv.org/abs/2209.01557): SolTrack: a free, fast and accurate routine to
+  compute the position of the Sun.  Scientific paper with all technical details.
+
 * [Pypi](https://pypi.org/project/soltrack/): SolTrack Python package
 * [GitHub](https://github.com/MarcvdSluys/SolTrack-Python): SolTrack Python source code
 * [ReadTheDocs](https://soltrack.readthedocs.io/en/latest/): SolTrack Python documentation
@@ -293,6 +296,9 @@ For single datetimes, 1000 calculations take about 0.68 seconds on the single CP
 
 
 ## References
+
+* [Van der Sluys & Van Kan](https://arxiv.org/abs/2209.01557): SolTrack: a free, fast and accurate routine to
+  compute the position of the Sun.  Scientific paper with all technical details.
 
 * [Celestial mechanics in a nutshell (CMiaNS)](https://cmians.sourceforge.io/): online living document.
 * Meeus, [Astronomical algorithms](https://www.willbell.com/math/MC1.HTM), 2nd Ed.

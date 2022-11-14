@@ -1,4 +1,4 @@
-astroconst==0.0.5
+astroconst==0.0.6
 astrotool==0.0.9
 numpy
 pandas

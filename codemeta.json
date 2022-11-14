@@ -24,11 +24,14 @@
     ],
     "citation": "https://ui.adsabs.harvard.edu/abs/2022ascl.soft09019V",
     "relatedLink": [
-        "https://pypi.org/project/soltrack/"
+        "https://arxiv.org/abs/2209.01557",
+        "https://pypi.org/project/soltrack/",
+        "https://soltrack.readthedocs.io"
     ],
     "codeRepository": [
-        "https://soltrack.sourceforge.net/"
-    ],
+        "https://soltrack.sourceforge.net/",
+        "https://github.com/MarcvdSluys/SolTrack-Python/",
+      ],
     "referencePublication": [
         {
             "@type": "ScholarlyArticle",
