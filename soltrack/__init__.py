@@ -20,10 +20,10 @@
 """SolTrack module
 
 SolTrack is a simple, free, fast and accurate Python package to compute the position of the Sun, as well as
-its rise and set times.  SolTrack can be used under the conditions of the EUPL 1.2 licence.  These pages contain
-the API documentation.  For more information on the Python package, licence, source code and data files, see
-the [SolTrack homepage](http://soltrack.sf.net).
-
+its rise and set times.  SolTrack can be used under the conditions of the EUPL 1.2 licence.  These pages
+contain the API documentation.  For more information on the Python package, licence, source code and data
+files, see the [SolTrack homepage](http://soltrack.sf.net) and [Van der Sluys & Van Kan
+(2022)](https://arxiv.org/abs/2209.01557) (open access scientific paper with all technical details).
 """
 
 name = 'soltrack'
