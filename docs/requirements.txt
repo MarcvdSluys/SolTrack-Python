@@ -1,0 +1,6 @@
+soltrack
+astroconst==0.0.8
+astrotool==0.0.10
+numpy
+pandas
+sphinx-rtd-theme
