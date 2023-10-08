@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[tool.setuptools]
+py-modules = []
+
+[project]
+name = "soltrack"
+version = "0.2.3"
+authors = [ { name="Marc van der Sluys", email="git@vandersluys.nl" } ]
+description = "A free, fast and accurate Python package to compute the position of the Sun"
+readme   = "README.md"
+license  = {text = "EUPL 1.2"}
+keywords = ["astronomy","ephemeris","sun","solar","solar energy"]
+dependencies = ["astroconst","astrotool","numpy","pandas"]
+
+# See: https://pypi.org/pypi?:action=list_classifiers
+classifiers = [
+        "Development Status :: 4 - Beta",
+        "Intended Audience :: Developers",
+        "Intended Audience :: Education",
+        "Intended Audience :: Science/Research",
+        "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
+        "Natural Language :: English",
+        "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
+        "Topic :: Scientific/Engineering",
+        "Topic :: Scientific/Engineering :: Astronomy",
+        "Topic :: Scientific/Engineering :: Physics",
+    ]
+
+[project.urls]
+SourceForge = "https://soltrack.sourceforge.net"
+GitHub = "https://github.com/MarcvdSluys/SolTrack-Python/"
+ReadTheDocs = "https://soltrack.readthedocs.io"
