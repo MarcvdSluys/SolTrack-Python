@@ -128,8 +128,8 @@ class RiseSet(Parameters):
         See computeRiseSet() for more details.
         """
         
-        rsa = -0.8333/_R2D                     # Standard altitude for the Sun in radians
-        if(abs(rs_alt) > 1.e-9): rsa = rs_alt  # Use a user-specified altitude
+        rsa = -0.8333/_R2D                    # Standard altitude for the Sun in radians
+        if abs(rs_alt) > 1.e-9: rsa = rs_alt  # Use a user-specified altitude
         
         tmRad = np.zeros(3)
         azalt = np.zeros(3)
@@ -139,7 +139,7 @@ class RiseSet(Parameters):
         # We need a local SolTrack instance for the same location (but in radians!), but with different settings
         # (radians, south=0, need equatorial coordinates but not the distance), and independent times and
         # positions:
-        if(self.param._use_degrees):
+        if self.param._use_degrees:
             st = self.__class__(self.geo_longitude/_R2D, self.geo_latitude/_R2D, use_degrees=False,
                                 use_north_equals_zero=False, compute_refr_equatorial=True, compute_distance=False)
         else:
@@ -161,14 +161,14 @@ class RiseSet(Parameters):
         cosH0 = (np.sin(rsa) - np.sin(st.geo_latitude) * np.sin(st._declination_uncorr)) / (np.cos(st.geo_latitude) *
                                                                                             np.cos(st._declination_uncorr))
         
-        if(abs(cosH0) > 1.0):      # Body never rises/sets
+        if abs(cosH0) > 1.0:       # Body never rises/sets
             evMax = 1              # Compute transit time and altitude only
         else:
             h0 = np.arccos(cosH0) % _PI  # Should probably work without %
         
         
         tmRad[0] = (st._right_ascension_uncorr - st.geo_longitude - st._agst) % _TWOPI  # Transit time in radians; lon0 > 0 for E
-        if(evMax > 1):
+        if evMax > 1:
             tmRad[1] = (tmRad[0] - h0) % _TWOPI   # Rise time in radians
             tmRad[2] = (tmRad[0] + h0) % _TWOPI   # Set time in radians
         
@@ -177,7 +177,7 @@ class RiseSet(Parameters):
             iter = 0
             dTmRad = np.inf
             
-            while(abs(dTmRad) > accur):
+            while abs(dTmRad) > accur:
                 th0 = agst0 + 1.002737909350795*tmRad[evi]  # Solar day in sidereal days in 2000
                 
                 st.second = tmRad[evi]*_R2H*3600.0          # Radians -> seconds - w.r.t. midnight (h=0,m=0)
@@ -195,7 +195,7 @@ class RiseSet(Parameters):
                                 np.cos(st.geo_latitude)*np.cos(st._declination_uncorr)*np.cos(ha))  # Altitude
                 
                 # Correction to transit/rise/set times:
-                if(evi==0):           # Transit
+                if evi==0:            # Transit
                     dTmRad = -self._rev_pi(ha)  # -PI - +PI
                 else:                 # Rise/set
                     dTmRad = (alt-rsa)/(np.cos(st._declination_uncorr)*np.cos(st.geo_latitude)*np.sin(ha))
@@ -207,23 +207,23 @@ class RiseSet(Parameters):
                 # print(" %3i %4i   %9.3lf %9.3lf %9.3lf \n" % (evi,iter, tmRad[evi]*24,abs(dTmRad)*24,accur*24))
                 
                 iter += 1
-                if(iter > 30): break  # The while loop doesn't seem to converge
+                if iter > 30: break  # The while loop doesn't seem to converge
             # end while(abs(dTmRad) > accur)
             
             
-            if(iter > 30):  # Convergence failed
+            if iter > 30:  # Convergence failed
                 print('\n  *** WARNING:  riset():  Riset failed to converge: %i %9.3lf  ***\n' % (evi,rs_alt))
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
             else:               # Result converged, store it
-                if(evi == 0):
+                if evi == 0:
                     azalt[evi] = alt                                                                      # Transit altitude
                 else:
                     azalt[evi] = np.arctan2( np.sin(ha), ( np.cos(ha) * np.sin(st.geo_latitude)  -
                                                            np.tan(st._declination_uncorr) * np.cos(st.geo_latitude) ) )   # Rise,set hour angle -> azimuth
             
             
-            if(tmRad[evi] < 0.0 and abs(rs_alt) < 1.e-9):
+            if tmRad[evi] < 0.0 and abs(rs_alt) < 1.e-9:
                 tmRad[evi] = -np.inf
                 azalt[evi] = -np.inf
                 
@@ -234,12 +234,12 @@ class RiseSet(Parameters):
         tmHrs = tmRad*_R2H
         
         # Set north to zero radians for azimuth if desired (use the original parameters!):
-        if(self.param._use_north_equals_zero):
+        if self.param._use_north_equals_zero:
             azalt[1] = (azalt[1] + _PI) % _TWOPI  # Add PI and fold between 0 and 2pi
             azalt[2] = (azalt[2] + _PI) % _TWOPI  # Add PI and fold between 0 and 2pi
         
         # Convert resulting angles to degrees if desired (use the original parameters!):
-        if(self.param._use_degrees):
+        if self.param._use_degrees:
             azalt[0] *= _R2D   # Transit altitude
             azalt[1] *= _R2D   # Rise azimuth
             azalt[2] *= _R2D   # Set azimuth

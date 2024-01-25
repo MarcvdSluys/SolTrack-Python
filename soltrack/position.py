@@ -81,7 +81,7 @@ class Position(Parameters):
         import astrotool as at
         
         # If the user uses degrees, convert the geographic location to radians:
-        if(self.param._use_degrees):
+        if self.param._use_degrees:
             self.geo_longitude /= _R2D
             self.geo_latitude  /= _R2D
         
@@ -115,16 +115,16 @@ class Position(Parameters):
         
         
         # Convert the corrected horizontal coordinates back to equatorial coordinates:
-        if(self.param._compute_refr_equatorial):
+        if self.param._compute_refr_equatorial:
             self._convert_horizontal_to_equatorial(self._sin_lat, self._cos_lat, self.azimuth,
                                                    self.altitude)
             
         # Use the North=0 convention for azimuth and hour angle (default: South = 0) if desired:
-        if(self.param._use_north_equals_zero):
+        if self.param._use_north_equals_zero:
             self._set_north_to_zero(self.azimuth, self.hour_angle)
             
         # If the user wants degrees, convert final results from radians to degrees:
-        if(self.param._use_degrees):
+        if self.param._use_degrees:
             self.geo_longitude *= _R2D          # Convert back to original
             self.geo_latitude  *= _R2D          # Convert back to original
             self._convert_radians_to_degrees()  # Convert final results
@@ -157,7 +157,7 @@ class Position(Parameters):
         omg  = 2.1824390725 - 33.7570464271 * self._tJC  + 3.622256e-5 * self._tJC2      # Lon. of Moon's mean ascending node
         dpsi = -8.338601e-5*np.sin(omg)                                                  # Nutation in longitude
         dist = np.ones_like(l0)*1.0000010178                                             # Mean distance to the Sun in AU
-        if(compute_distance):
+        if compute_distance:
             ecc = 0.016708634 - 0.000042037   * self._tJC  -  0.0000001267 * self._tJC2  # Eccentricity of the Earth's orbit
             nu = ma + sec                                                                # True anomaly
             dist = dist*(1.0 - ecc**2)/(1.0 + ecc*np.cos(nu))                            # Geocentric distance of the Sun in AU
@@ -318,7 +318,7 @@ class Position(Parameters):
         
         self.azimuth = (azimuth + _PI) % _TWOPI                    # Add PI to set North=0
         
-        if(self.param._compute_refr_equatorial):
+        if self.param._compute_refr_equatorial:
             self.hour_angle = (hour_angle + _PI) % _TWOPI          # Add PI to set North=0
             
         return
@@ -340,7 +340,7 @@ class Position(Parameters):
         self.azimuth *= _R2D
         self.altitude *= _R2D
         
-        if(self.param._compute_refr_equatorial):
+        if self.param._compute_refr_equatorial:
             self.hour_angle *= _R2D
             self.declination *= _R2D
             

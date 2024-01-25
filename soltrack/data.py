@@ -49,10 +49,10 @@ class Parameters:
           compute_distance (bool):         Compute the distance to the Sun.
         """
         
-        if(use_degrees is not None):              self._use_degrees              = use_degrees
-        if(use_north_equals_zero is not None):    self._use_north_equals_zero    = use_north_equals_zero
-        if(compute_refr_equatorial is not None):  self._compute_refr_equatorial  = compute_refr_equatorial
-        if(compute_distance is not None):         self._compute_distance         = compute_distance
+        if use_degrees is not None:              self._use_degrees              = use_degrees
+        if use_north_equals_zero is not None:    self._use_north_equals_zero    = use_north_equals_zero
+        if compute_refr_equatorial is not None:  self._compute_refr_equatorial  = compute_refr_equatorial
+        if compute_distance is not None:         self._compute_distance         = compute_distance
         
         return
     
