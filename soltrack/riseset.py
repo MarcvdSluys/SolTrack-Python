@@ -97,26 +97,32 @@ class RiseSet(Parameters):
             riAz  = np.append(riAz,  azalt[1])  # Rise azimuth (rad)
             seAz  = np.append(seAz,  azalt[2])  # Set azimuth (rad)
         
-        
-        # Store final results:
-        self.transit_time      = trTime
-        self.rise_time         = riTime
-        self.set_time          = seTime
-        
-        self.transit_altitude  = trAlt
-        self.rise_azimuth      = riAz
-        self.set_azimuth       = seAz
-        
         # If a single time was used, convert arrays to scalars:
         if orig_dt.size == 1:
-            self.transit_time      = np.squeeze(self.transit_time)             # Array -> scalar
-            self.rise_time         = np.squeeze(self.rise_time)                # Array -> scalar
-            self.set_time          = np.squeeze(self.set_time)                 # Array -> scalar
+            if return_datetimes:
+                self.transit_time      = pd.Timestamp(tmHrs[0])  # Array -> scalar
+                self.rise_time         = pd.Timestamp(tmHrs[1])  # Array -> scalar
+                self.set_time          = pd.Timestamp(tmHrs[2])  # Array -> scalar
+            else:
+                self.transit_time      = tmHrs[0]                # Array -> scalar
+                self.rise_time         = tmHrs[1]                # Array -> scalar
+                self.set_time          = tmHrs[2]                # Array -> scalar
             
-            self.transit_altitude  = float(np.squeeze(self.transit_altitude))  # Array -> scalar, float
-            self.rise_azimuth      = float(np.squeeze(self.rise_azimuth))      # Array -> scalar, float
-            self.set_azimuth       = float(np.squeeze(self.set_azimuth))       # Array -> scalar, float
+            self.transit_altitude  = azalt[0]                # Array -> scalar, float
+            self.rise_azimuth      = azalt[1]                # Array -> scalar, float
+            self.set_azimuth       = azalt[2]                # Array -> scalar, float
             
+        else:
+            
+            # Store final arrays:
+            self.transit_time      = trTime
+            self.rise_time         = riTime
+            self.set_time          = seTime
+            
+            self.transit_altitude  = trAlt
+            self.rise_azimuth      = riAz
+            self.set_azimuth       = seAz
+        
         return
     
     
