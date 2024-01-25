@@ -93,6 +93,13 @@ class Time:
              variables.
         """
         
+        dt_obj = np.asarray(np.copy(dt_obj))  # Copy and typecast to numpy.ndarray
+        
+        scalar_input = False
+        if dt_obj.ndim == 0:
+            dt_obj = dt_obj[None]  # Makes dt_obj a 1D array.  Comment: use np.newaxis instead?
+            scalar_input = True
+        
         if utc:  # up to ~29% faster if datetimes are known to be UTC.  Create DatetimeIndex with UTC times directly:
             if np.ndim(dt_obj) == 0:  # Scalar, needs to be converted using [array]:
                 self.utc = pd.to_datetime(np.asarray([dt_obj]))  # DatetimeIndex
@@ -121,6 +128,14 @@ class Time:
         self.hour   = self.utc.hour.to_numpy()
         self.minute = self.utc.minute.to_numpy()
         self.second = self.utc.second.to_numpy() + self.utc.microsecond.to_numpy()/1e6
+        
+        if scalar_input:
+            self.year    = int(np.squeeze(self.year))      # Array -> scalar, int
+            self.month   = int(np.squeeze(self.month))     # Array -> scalar, int
+            self.day     = int(np.squeeze(self.day))       # Array -> scalar, int
+            self.hour    = int(np.squeeze(self.hour))      # Array -> scalar, int
+            self.minute  = int(np.squeeze(self.minute))    # Array -> scalar, int
+            self.second  = float(np.squeeze(self.second))  # Array -> scalar, float
         
         return
     
