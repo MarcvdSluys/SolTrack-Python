@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # SPDX-License-Identifier: EUPL-1.2
 #  
-#  Copyright (c) 2019-2022  Marc van der Sluys - marc.vandersluys.nl
+#  Copyright (c) 2019-2024  Marc van der Sluys - marc.vandersluys.nl
 #  
 #  This file is part of the SolTrack Python package,
 #  see: http://soltrack.sf.net
