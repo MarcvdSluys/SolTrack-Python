@@ -80,7 +80,7 @@ class RiseSet(Parameters):
         else:
             orig_dt = self.utc  # Try to correct for tz using geoLon?  Important is that 'midnight' lies between sunset and sunrise (CHECK: true? sufficient?)
         
-            
+        
         for OrigDTi in orig_dt:  # Loop over dates in array
             tmHrs, azalt = self._compute_rise_set_single(OrigDTi, rs_alt, accur, return_datetimes)  # Compute r/s/t for a single date
             
@@ -102,10 +102,21 @@ class RiseSet(Parameters):
         self.transit_time      = trTime
         self.rise_time         = riTime
         self.set_time          = seTime
+        
         self.transit_altitude  = trAlt
         self.rise_azimuth      = riAz
         self.set_azimuth       = seAz
         
+        # If a single time was used, convert arrays to scalars:
+        if orig_dt.size == 1:
+            self.transit_time      = np.squeeze(self.transit_time)             # Array -> scalar
+            self.rise_time         = np.squeeze(self.rise_time)                # Array -> scalar
+            self.set_time          = np.squeeze(self.set_time)                 # Array -> scalar
+            
+            self.transit_altitude  = float(np.squeeze(self.transit_altitude))  # Array -> scalar, float
+            self.rise_azimuth      = float(np.squeeze(self.rise_azimuth))      # Array -> scalar, float
+            self.set_azimuth       = float(np.squeeze(self.set_azimuth))       # Array -> scalar, float
+            
         return
     
     
