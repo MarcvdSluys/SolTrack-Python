@@ -1,6 +1,6 @@
 soltrack
 astroconst==0.0.10
-astrotool==0.0.12
+astrotool==0.0.14
 numpy
 pandas
 sphinx-rtd-theme
