@@ -11,7 +11,7 @@ version = "0.3.1"
 authors = [ { name="Marc van der Sluys", email="git@vandersluys.nl" } ]
 description = "A free, fast and accurate Python package to compute the position of the Sun"
 readme   = "README.md"
-license  = {text = "EUPL 1.2"}
+license  = "EUPL-1.2"
 keywords = ["astronomy","ephemeris","sun","solar","solar energy"]
 dependencies = ["astroconst","astrotool","numpy","pandas"]
 
@@ -21,7 +21,6 @@ classifiers = [
         "Intended Audience :: Developers",
         "Intended Audience :: Education",
         "Intended Audience :: Science/Research",
-        "License :: OSI Approved :: European Union Public Licence 1.2 (EUPL 1.2)",
         "Natural Language :: English",
         "Operating System :: OS Independent",
         "Programming Language :: Python :: 3",
