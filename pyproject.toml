@@ -7,7 +7,7 @@ packages = ["soltrack"]
 
 [project]
 name = "soltrack"
-version = "0.3.1"
+version = "0.3.2"
 authors = [ { name="Marc van der Sluys", email="git@vandersluys.nl" } ]
 description = "A free, fast and accurate Python package to compute the position of the Sun"
 readme   = "README.md"
