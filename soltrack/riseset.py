@@ -20,7 +20,7 @@
 from dataclasses import dataclass
 import numpy as np
 import pandas as pd
-import astrotool as at
+import astrotool.date_time as at_dt
 from astroconst import r2d as _R2D, pi as _PI, pi2 as _TWOPI, r2h as _R2H
 
 from .data import Parameters
@@ -263,8 +263,8 @@ class RiseSet(Parameters):
         
         if return_datetimes:  # Return datetimes iso time in hours:
             # tmHrs now contains [transit, rise, set] times in the local timezone.  Convert to datetime Series.
-            jds = at.jd_from_date(midnight.year, midnight.month, midnight.day) + tmHrs/24
-            tmDTs = at.date_time_from_jd(jds)  # Array of 6 arrays containing N x year, N x month, NxD, NxHour,NxMin,NxSec.
+            jds = at_dt.jd_from_date(midnight.year, midnight.month, midnight.day) + tmHrs/24
+            tmDTs = at_dt.date_time_from_jd(jds)  # Array of 6 arrays containing N x year, N x month, NxD, NxHour,NxMin,NxSec.
             
             # Combine the six date/time values into a single "2D" array with a single row and the original values as
             # columns, and convert it to a Pandas df:
@@ -272,7 +272,7 @@ class RiseSet(Parameters):
                               columns=['year','month','day', 'hour','minute','second'])
             
             # Convert the date+time columns into a Pandas Series containing datetimes and round off to nearest second.
-            tmDTI = pd.Series.copy(pd.to_datetime(df).dt.round('S'))  # Without .copy(), None below throws an error
+            tmDTI = pd.Series.copy(pd.to_datetime(df).dt.round('s'))  # Without .copy(), None below throws an error
             
             if evMax == 1:  # No rise or set, transit only
                 tmDTI[1:3] = None

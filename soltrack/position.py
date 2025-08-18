@@ -78,7 +78,7 @@ class Position(Parameters):
         """ Method to compute the position of the Sun.
         """
         
-        import astrotool as at
+        import astrotool.date_time as at_dt
         
         # If the user uses degrees, convert the geographic location to radians:
         if self.param._use_degrees:
@@ -91,7 +91,7 @@ class Position(Parameters):
         
         
         # Compute the Julian Day from the date and time:
-        self.julian_day = at.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
+        self.julian_day = at_dt.jd_from_date_time(self.year, self.month, self.day, self.hour, self.minute, self.second)
         
         # CHECK1: the line below instead of above alone makes the whole compute_position() call ~36% slower!
         # However, combining this with the removal of self.year-self.second in set_date_time() is only slightly
