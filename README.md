@@ -89,7 +89,8 @@ instead, as it is faster starting from calculations for two instances.  See the 
 [Performance](#performance) for more details.  The code listing below is provided for completeness only.
 
 
-```python """Example Python script to compute the position of the Sun and its rise and set times for a single instant
+```python 
+"""Example Python script to compute the position of the Sun and its rise and set times for a single instant
 and demonstrate some other features."""
 
 from soltrack import SolTrack
