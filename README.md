@@ -30,18 +30,6 @@ by hand, ensure that these packages are installed as well.
 
 ## Example use
 
-### Update from v0.1.x to v0.2.0
-
-The update from SolTrack v0.1.4 to v0.3.0 is **not backwards compatible**.  Most public members/variables and
-methods/functions, as well as dummy arguments have been renamed in order to comply better with the Python
-standards.  I have tried to put as much nuisance into a single update as possible (as opposed to in multiple
-updates, rather than as opposed to as little nuisance as possible), so that this will hopefully not happen
-again in the future.  For public methods, the obsolescent old name is kept as an alias, and warnings are
-issued when used, instructing how to adapt your code.  In many cases a variable or function name `likeThis`
-will have been replaced to one `like_this`, i.e. upper case replaced with an underscore and lower case.  See
-the [documentation](https://soltrack.readthedocs.io) for more details.
-
-
 ### Code example for a number or range of datetimes
 
 ```python """Compute the position of the Sun and its rise and set times for a vector of instances."""
@@ -152,6 +140,18 @@ print("Date (UT):  %4d-%02d-%02d"                              % (st.year, st.mo
 print("Time (UT):  %02d:%02d:%09.6lf"                          % (st.hour, st.minute, st.second))
 print("Corrected azimuth, altitude:         %10.6lf° %10.6lf°" % (st.azimuth, st.altitude))
 ```
+
+
+### Update from v0.1.x to v0.2.0
+
+The update from SolTrack v0.1.4 to v0.2.0 is **not backwards compatible**.  Most public members/variables and
+methods/functions, as well as dummy arguments have been renamed in order to comply better with the Python
+standards.  I have tried to put as much nuisance into a single update as possible (as opposed to in multiple
+updates, rather than as opposed to as little nuisance as possible), so that this will hopefully not happen
+again in the future.  For public methods, the obsolescent old name is kept as an alias, and warnings are
+issued when used, instructing how to adapt your code.  In many cases a variable or function name `likeThis`
+will have been replaced to one `like_this`, i.e. upper case replaced with an underscore and lower case.  See
+the [documentation](https://soltrack.readthedocs.io) for more details.
 
 
 ### Code example for SolTrack v0.1.x (old)
@@ -306,4 +306,4 @@ For single datetimes, 1000 calculations take about 0.68 seconds on the single CP
   [libTheSky](http://libthesky.sourceforge.net/), which contains many references.
 
 
-<sub>Copyright (c) 2019-2022 Marc van der Sluys</sub>
+<sub>Copyright (c) 2019-2025 Marc van der Sluys</sub>
