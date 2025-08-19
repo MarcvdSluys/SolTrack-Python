@@ -10,10 +10,10 @@ A free, fast and simple Python package to compute the position of the Sun, as we
 SolTrack was originally written in C/C++ by [Marc van der Sluys](http://marc.vandersluys.nl) of the department
 of astrophysics of the Radboud University Nijmegen, the Netherlands and the Sustainable energy research group
 of the HAN University of Applied Sciences in Arnhem, the Netherlands (now at the Netherlands Institute for
-Nuclear and High-Energy Physics (Nikhef) and the Institute for Gravitational and Subatomic Physics (GRASP) at
-Utrecht University in the Netherlands), and Paul van Kan of the Sustainable energy research group of the HAN
-University of Applied Sciences in Arnhem, the Netherlands.  The code has now been translated to pure Python
-and can be used under the conditions of the EUPL 1.2 licence.
+Nuclear and High-Energy Physics (Nikhef) in Amsterdam and the Institute for Gravitational and Subatomic
+Physics (GRASP) at Utrecht University in the Netherlands), and Paul van Kan of the Sustainable energy research
+group of the HAN University of Applied Sciences in Arnhem, the Netherlands.  The code has now been translated
+to pure Python and can be used under the conditions of the EUPL 1.2 licence.
 
 SolTrack can perform up to 1.5 million position calculations per second on a single 3.4 GHz core of my laptop
 (the [C version of SolTrack](http://soltrack.sourceforge.net/) is about twice as fast) with an accuracy of
@@ -46,7 +46,7 @@ the [documentation](https://soltrack.readthedocs.io) for more details.
 
 ```python """Compute the position of the Sun and its rise and set times for a vector of instances."""
 
-# Create a Pandas DatetimeIndex range every 20 days 1hour and 10 minutes, in my timezone:
+# Create a Pandas DatetimeIndex range every 20 days 1 hour and 10 minutes, in my timezone:
 import pandas as pd
 dti = pd.date_range('2022-01-01 01:00', '2022-12-31 23:00', freq='20d1h10min', tz='Europe/Amsterdam')
 
@@ -89,8 +89,7 @@ instead, as it is faster starting from calculations for two instances.  See the 
 [Performance](#performance) for more details.  The code listing below is provided for completeness only.
 
 
-```python
-"""Example Python script to compute the position of the Sun and its rise and set times for a single instant
+```python """Example Python script to compute the position of the Sun and its rise and set times for a single instant
 and demonstrate some other features."""
 
 from soltrack import SolTrack
@@ -134,9 +133,9 @@ print("Corrected azimuth, altitude:         %10.6lf° %10.6lf°"     % (st.azimu
 print("Corrected hour angle, declination:   %10.6lf° %10.6lf°"     % (st.hour_angle, st.declination))
 print()
 
-print("Rise time:      %s,    azimuth:   %11.5lf" % (*st.rise_time,     *st.rise_azimuth))
-print("Transit time:   %s,    altitude:  %11.5lf" % (*st.transit_time,  *st.transit_altitude))
-print("Set time:       %s,    azimuth:   %11.5lf" % (*st.set_time,      *st.set_azimuth))
+print("Rise time:      %s,    azimuth:   %11.5lf" % (st.rise_time,     st.rise_azimuth))
+print("Transit time:   %s,    altitude:  %11.5lf" % (st.transit_time,  st.transit_altitude))
+print("Set time:       %s,    azimuth:   %11.5lf" % (st.set_time,      st.set_azimuth))
 print()
 
 
